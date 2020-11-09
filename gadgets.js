@@ -1,5 +1,7 @@
 
-const BASE = 0x3ff7ea1000n;
+// const BASE = 0x3ff7ea1000n;
+const BASE = 0x2aaaaaa000n;
+const LIBC_BASE = 0x2000048f50n;
 
 const bfInstructions = {};
 
@@ -73,7 +75,8 @@ class NOP extends Gadget{
         return [0, this.nextRa];
     }
     getEntryPoint() {
-        return 0x0000000000097a68n + BASE;
+        return 0x0000000000000a3an + BASE;
+        // return 0x0000000000097a68n + BASE;
     }
 }
 
@@ -92,7 +95,8 @@ class PopA0 extends Gadget {
         ];
     }
     getEntryPoint() {
-        return 0x0000000000058d9en + BASE;
+        return 0x0000000000000a68n + BASE;
+        // return 0x0000000000058d9en + BASE;
     }
     getPoppedA0Location(){
         return this.getFrameLocation() + 8;
@@ -112,7 +116,8 @@ class PopS0 extends Gadget {
         return [this.s0, this.nextRa];
     }
     getEntryPoint() {
-        return 0x000000000005c172n + BASE;
+        return 0x0000000000000a70n + BASE;
+        // return 0x000000000005c172n + BASE;
     }
     getPoppedS0Location() {
         return this.getFrameLocation();
@@ -135,7 +140,8 @@ class Add1A0 extends Gadget {
         ]
     }
     getEntryPoint(){
-        return 0x000000000006dc7en + BASE;
+        return 0x0000000000000a78n + BASE;
+        // return 0x000000000006dc7en + BASE;
     }
 }
 
@@ -147,7 +153,8 @@ class Dec2A0 extends Gadget {
         return [ 0, this.nextRa ];
     }
     getEntryPoint(){
-        return 0x000000000006437en + BASE;
+        return 0x0000000000000a82n + BASE;
+        // return 0x000000000006437en + BASE;
     }
 }
 
@@ -175,7 +182,8 @@ class _LdA5_S0 extends Gadget {
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, this.a4, this.s0, this.nextRa ];
     }
     getEntryPoint() {
-        return 0x00000000000a4ac8n + BASE;
+        return 0x0000000000000a8an + BASE;
+        // return 0x00000000000a4ac8n + BASE;
     }
 }
 
@@ -213,7 +221,8 @@ class _LdA0_8A0 extends Gadget {
         return [0, 0, 0, 0, 0, this.a4, this.s0, this.nextRa ]
     }
     getEntryPoint() {
-        return 0x00000000000d3230n + BASE;
+        return 0x0000000000000a9en + BASE;
+        // return 0x00000000000d3230n + BASE;
     }
 }
 
@@ -248,7 +257,8 @@ class SdA0_0x10S0 extends Gadget {
        return [this.nextS0, this.nextRa];
    }
    getEntryPoint() {
-       return 0x00000000000d30den + BASE;
+       return 0x0000000000000ab6n + BASE;
+       // return 0x00000000000d30den + BASE;
    }
 }
 
@@ -298,7 +308,8 @@ class _PopA5 extends Gadget {
        return [0, this.a5, 0, this.nextRa]
    }
    getEntryPoint() {
-       return 0x000000000002d9d6n + BASE;
+       return 0x0000000000000ac0n + BASE;
+       // return 0x000000000002d9d6n + BASE;
    }
 }
 
@@ -326,7 +337,8 @@ class _CallA5 extends Gadget {
         return [this.s0, this.nextRa];
     }
     getEntryPoint(){
-        return 0x00000000000b95d4n + BASE;
+        return 0x0000000000000acan + BASE;
+        // return 0x00000000000b95d4n + BASE;
     }
 }
 
@@ -338,7 +350,9 @@ class _Longjmp extends Gadget {
         return [];
     }
     getEntryPoint() {
-        return 0x00000000000325b4n + BASE;
+        // return 0x0000002000058494n;
+        return 0x0000000000000ad8n + BASE;
+        // return 0x00000000000325b4n + BASE;
     }
 }
 
@@ -365,7 +379,8 @@ class SeqzA0 extends Gadget {
         return [0, this.nextRa];
     }
     getEntryPoint(){
-        return 0x00000000000d1ad6n + BASE
+        return 0x0000000000000b40n + BASE;
+        // return 0x00000000000d1ad6n + BASE
     }
 }
 
@@ -385,7 +400,8 @@ class PopS0S1S2 extends Gadget {
         ]
     }
     getEntryPoint() {
-        return 0xa3b34n + BASE
+        return 0x0000000000000b4an + BASE;
+        // return 0xa3b34n + BASE
     }
 }
 
@@ -404,7 +420,8 @@ class _AddA5A0 extends Gadget {
         return [0, this.s3, this.s2, this.s1, this.s0, this.nextRa];
     }
     getEntryPoint(){
-        return 0x0000000000060f40n + BASE
+        return 0x0000000000000b56n + BASE;
+        // return 0x0000000000060f40n + BASE
     }
 }
 
@@ -416,7 +433,8 @@ class _AddA0A5 extends Gadget {
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, this.nextRa];
     }
     getEntryPoint(){
-        return 0x00000000000a91c0n + BASE;
+        return 0x0000000000000b6an + BASE;
+        // return 0x00000000000a91c0n + BASE;
     }
 }
 
@@ -525,7 +543,8 @@ class OutputCharAtA0 extends Sequence {
             new WriteA0(null, 0),
             new Sub8FromA0(),
             new LdA0_8A0(),
-            new CallFunc(0x000000000005b70an + BASE), //putchar
+            new CallFunc(0x0000002000080bccn), //putchar
+            // new CallFunc(0x000000000005b70an + BASE), //putchar
             new PopA0(0)
         ])
     }
@@ -545,7 +564,8 @@ class InputCharAtA0 extends Sequence {
             new Sub8FromA0(),
             new Sub8FromA0(),
             new WriteA0(null, 0), //write to the pop S0
-            new CallFunc(0x000000000005eaa6n + BASE), //getchar
+            new CallFunc(0x0000002000083f76n), //getchar
+            // new CallFunc(0x000000000005eaa6n + BASE), //getchar
             new PopS0(0),
             new SdA0_0x10S0(0),
             new PopA0(0)
@@ -729,7 +749,8 @@ function sanitizeBrainfuck(bf) {
 
 function brainfuckToRop(bf) {
     let initSeq = [new NOP(), new PopA0(0x38000000)];
-    let endSeq = [new PopA0(0), new CallFunc(0x00000000000342e4n + BASE)] //exit(0)
+    let endSeq = [new PopA0(0), new CallFunc(0x000000200005a220n)] //exit(0)
+    // let endSeq = [new PopA0(0), new CallFunc(0x00000000000342e4n + BASE)] //exit(0)
 
     let seq = initSeq.concat(
         bf.split('')
