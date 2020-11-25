@@ -27,7 +27,7 @@ void *fill_buf(void *location, FILE *fd) {
 	return location;
 }
 
-void start_rop(void *stackbuf);
+void start_jop(void *stackbuf);
 
 int main() {
 	setbuf(stdout, NULL);
@@ -43,5 +43,5 @@ int main() {
 		exit(1);
 	}
 
-	start_rop(stack_buf);
+	start_jop(stack_buf);
 }
