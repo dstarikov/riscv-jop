@@ -2,19 +2,19 @@ class JmpBuf {
     constructor(base){
         this.base = base;
         this.nextSpot = 0;
-        this.buf = new Array(26).fill(0);
+        this.buf = new Array(52).fill(0);
     }
     _nextRaLoc(){
         return this.nextSpot;
     }
     _nextSpLoc() {
-        return this.nextSpot + 13;
+        return this.nextSpot + 26;
     }
     _advancePtr() {
         this.nextSpot ++;
-        if(this.nextSpot % 13 === 0) {
-            this.nextSpot += 13;
-            this.buf = this.buf.concat(new Array(26).fill(0));
+        if(this.nextSpot % 26 === 0) {
+            this.nextSpot += 26;
+            this.buf = this.buf.concat(new Array(52).fill(0));
         }
     }
     makeTarget(ra, sp){ //returns what a0 should be
