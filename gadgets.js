@@ -509,7 +509,7 @@ class ConditionalStackPivot extends Sequence {
         super.setFrameLocation(location);
     }
     setDests(trueRa, trueSp, falseRa, falseSp){
-        if(jmpBuf.nextSpot % 26 === 25) { //we cannot allocate two more jump buffers or else they will be split
+        if(jmpBuf.nextSpot % 13 === 12) { //we cannot allocate two more jump buffers or else they will be split
             jmpBuf.makeTarget(0, 0); //allocate a dummy so we move on to the next set
         }
         const trueJmp = jmpBuf.makeTarget(trueRa, trueSp);
@@ -584,7 +584,7 @@ class CallFunc extends Sequence {
         
         this.seq[0] = new WriteVals([0, 0, 0, this.seq[12].getEntryPoint(), 0x30000000, this.seq[14].getEntryPoint()], this.seq[10].getFrameLocation());
         this.seq[2] = new WriteA0(this.seq[10].getPoppedA0Location(), 0);
-        this.seq[6] = new StackPivot(this.seq[10].getEntryPoint(), this.seq[10].getFrameLocation()); //TODO UPDATE
+        this.seq[6] = new StackPivot(this.seq[9].getEntryPoint(), this.seq[9].getFrameLocation()); //TODO UPDATE
 
         super.setFrameLocation(location);
     }
@@ -677,11 +677,13 @@ class BeginLoop extends Sequence {
         super.setFrameLocation(location);
     }
     setEnd(endLoop){ //called after setFrameLocation
+        const beforeEndPop = endLoop.seq[3]
         const endPop = endLoop.seq[4];
+        const beforeBeginPop = this.seq[13]
         const beginPop = this.seq[14];
         this.seq[6] = new WriteA0(endPop.getPoppedA0Location(), 0);
 
-        this.seq[12].setDests(beginPop.getEntryPoint(), beginPop.getFrameLocation(), endPop.getEntryPoint(), endPop.getFrameLocation());
+        this.seq[12].setDests(beforeBeginPop.getEntryPoint(), beginPop.getFrameLocation(), beforeEndPop.getEntryPoint(), endPop.getFrameLocation());
     }
 }
 
