@@ -1,7 +1,7 @@
 .global pop_a0
 pop_a0:
-  ld  a0,(sp)
-  ld  a6,8(sp)
+  ld  a0,0x8(sp)
+  ld  a6,0x18(sp)
   c.jalr  a6
 
 .global pop_s0

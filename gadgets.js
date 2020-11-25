@@ -80,6 +80,8 @@ class Ret extends Gadget{
         super()
         if (prevGadget == null) {
             this.prevGadgetStackSize = 0
+        } else if (prevGadget instanceof Sequence) {
+            this.prevGadgetStackSize = prevGadget.seq[prevGadget.seq.length - 1].synthesize().length
         } else {
             this.prevGadgetStackSize = prevGadget.synthesize().length
         }
@@ -113,9 +115,9 @@ class PopA0 extends Gadget {
     }
     synthesize() {
         return [
-            // Load a0 from 0(sp)
-            // Load a6 from 8(sp)
-            this.a0, this.nextRa
+            // Load a0 from 0x8(sp)
+            // Load a6 from 0x18(sp)
+            0n, this.a0, 0n, this.nextRa
         ];
     }
     getEntryPoint() {
@@ -214,7 +216,6 @@ class _LdA5_S0 extends Gadget {
 class PrepareLdA0_A0 extends Sequence {
     constructor() {
         super([
-            // TODO
             new PopS0(0x30000000), //scratch space
             new Ret(),
             new _LdA5_S0(0, 0x30000000),
@@ -257,7 +258,6 @@ class LdA0_8A0 extends Sequence {
     //SIDE EFFECTS: will cobble a4, a5, and s0
     constructor() {
         super([
-            // TODO
             new PrepareLdA0_A0(), 
             new Ret(),
             new _LdA0_8A0(0, 0x30000000),
@@ -386,13 +386,14 @@ class StackPivot extends Sequence {
             // TODO
             new PopA0(null),
             new Ret(),
-            new _Longjmp()
+            new _Longjmp(),
         ])
         if(destRa && destSp){
             this.setDest(destRa, destSp);
         }
     }
     setDest(ra, sp) {
+        // TODO: longjmp needs to jump to ret then popa0 instead of popa0 directly
         this.seq[0] = new PopA0(jmpBuf.makeTarget(ra, sp))
     }
 }
@@ -496,12 +497,13 @@ class ConditionalStackPivot extends Sequence {
             new Ret(),
             new _AddA0A5(),
             new Ret(),
-            new _Longjmp()
+            new _Longjmp(),
         ])
     }
     setFrameLocation(location){
         super.setFrameLocation(location);
         
+        // TODO: longjmp needs to jump to ret then popa0 instead of popa0 directly
         this.seq[0] = new WriteA0(this.seq[4].getPoppedA0Location(), 0);
 
         super.setFrameLocation(location);
@@ -824,9 +826,9 @@ bfInstructions['['] = BeginLoop;
 bfInstructions[']'] = EndLoop;
 
 function createProgram(gadgets) {
-    const result = new Sequence([new Ret(null), ...gadgets]);
+    const result = new Sequence([new Ret(), ...gadgets]);
 
-    result.setNextRa(new Ret(null).getEntryPoint());
+    result.setNextRa(new Ret().getEntryPoint());
     result.setFrameLocation(0x10000000);
 
     return result;
