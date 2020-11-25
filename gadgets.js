@@ -582,9 +582,9 @@ class CallFunc extends Sequence {
     setFrameLocation(location) {
         super.setFrameLocation(location);
         
-        this.seq[0] = new WriteVals([0, 0, 0, this.seq[12].getEntryPoint(), 0x30000000, this.seq[14].getEntryPoint()], this.seq[10].getFrameLocation());
+        this.seq[0] = new WriteVals([0, 0, 0, this.seq[11].getEntryPoint(), 0x30000000, this.seq[13].getEntryPoint()], this.seq[10].getFrameLocation());
         this.seq[2] = new WriteA0(this.seq[10].getPoppedA0Location(), 0);
-        this.seq[6] = new StackPivot(this.seq[9].getEntryPoint(), this.seq[9].getFrameLocation()); //TODO UPDATE
+        this.seq[6] = new StackPivot(this.seq[9].getEntryPoint(), this.seq[10].getFrameLocation()); //TODO UPDATE
 
         super.setFrameLocation(location);
     }
@@ -699,9 +699,10 @@ class EndLoop extends Sequence {
         ])
     }
     setBeginning(beginLoop) { //should be called after setFrameLocation
+        const beforePopA0 = beginLoop.seq[1]
         const popA0 = beginLoop.seq[2]
         this.seq[0] = new WriteA0(popA0.getPoppedA0Location(), 0);
-        this.seq[2] = new StackPivot(popA0.getEntryPoint(), popA0.getFrameLocation());
+        this.seq[2] = new StackPivot(beforePopA0.getEntryPoint(), popA0.getFrameLocation());
     }
 }
 
