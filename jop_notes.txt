@@ -57,3 +57,101 @@ Loads s1 into a0, jumps to s2
    a06d8:	4609                	li	a2,2
    a06da:	9782                	jalr	a5
 
+
+// Potential Dispatcher Gadgets    
+// Best Looking:
+// Prerequisite: a5
+// Loads from pointer in s6 to a0,a1,a2,a5 then jumps to a5
+   9e278:	0b0b3603          	ld	a2,176(s6)
+   9e27c:	088b3783          	ld	a5,136(s6)
+   9e280:	0a0b3583          	ld	a1,160(s6)
+   9e284:	080b3503          	ld	a0,128(s6)
+   9e288:	9782                	jalr	a5
+
+// Loads from pointer a5 to t1
+// Copies s1-s5 to a1-5, sets a7 to 0
+// Stores data onto 0(sp) and 8(sp)
+// jumps to t1 (*a5)
+   c9f9e:	0007b303          	ld	t1,0(a5)
+   c9fa2:	4881                	li	a7,0
+   c9fa4:	87d6                	mv	a5,s5
+   c9fa6:	8752                	mv	a4,s4
+   c9fa8:	86ce                	mv	a3,s3
+   c9faa:	864a                	mv	a2,s2
+   c9fac:	85a6                	mv	a1,s1
+   c9fae:	e072                	sd	t3,0(sp)
+   c9fb0:	e402                	sd	zero,8(sp)
+   c9fb2:	9302                	jalr	t1
+
+   30bf0:	9efa                	add	t4,t4,t5
+   30bf2:	000eae03          	lw	t3,0(t4)
+   30bf6:	9e7a                	add	t3,t3,t5
+   30bf8:	8e02                	jr	t3
+
+   3411e:	6f98                	ld	a4,24(a5)
+   34120:	7388                	ld	a0,32(a5)
+   34122:	0007b823          	sd	zero,16(a5)
+   34126:	85da                	mv	a1,s6
+   34128:	9702                	jalr	a4
+
+   34184:	601c                	ld	a5,0(s0)
+   34186:	0421                	addi	s0,s0,8
+   34188:	9782                	jalr	a5
+
+   34194:	6f9c                	ld	a5,24(a5)
+   34196:	9782                	jalr	a5
+
+   3419a:	6f98                	ld	a4,24(a5)
+   3419c:	738c                	ld	a1,32(a5)
+   3419e:	855a                	mv	a0,s6
+   341a0:	9702                	jalr	a4
+
+   34594:	851a                	mv	a0,t1
+   34596:	9802                	jalr	a6
+
+
+
+   3e8da:	0b02b303          	ld	t1,176(t0)
+   3e8de:	0b82b083          	ld	ra,184(t0)
+   3e8e2:	0c02b103          	ld	sp,192(t0)
+   3e8e6:	0f02b403          	ld	s0,240(t0)
+   3e8ea:	0f82b483          	ld	s1,248(t0)
+   3e8ee:	1002b503          	ld	a0,256(t0)
+   3e8f2:	1082b583          	ld	a1,264(t0)
+   3e8f6:	1102b603          	ld	a2,272(t0)
+   3e8fa:	1182b683          	ld	a3,280(t0)
+   3e8fe:	1202b703          	ld	a4,288(t0)
+   3e902:	1282b783          	ld	a5,296(t0)
+   3e906:	1302b803          	ld	a6,304(t0)
+   3e90a:	1382b883          	ld	a7,312(t0)
+   3e90e:	1402b903          	ld	s2,320(t0)
+   3e912:	1482b983          	ld	s3,328(t0)
+   3e916:	1502ba03          	ld	s4,336(t0)
+   3e91a:	1582ba83          	ld	s5,344(t0)
+   3e91e:	1602bb03          	ld	s6,352(t0)
+   3e922:	1682bb83          	ld	s7,360(t0)
+   3e926:	1702bc03          	ld	s8,368(t0)
+   3e92a:	1782bc83          	ld	s9,376(t0)
+   3e92e:	1802bd03          	ld	s10,384(t0)
+   3e932:	1882bd83          	ld	s11,392(t0)
+   3e936:	8302                	jr	t1
+
+   55e24:	82ce                	mv	t0,s3
+   55e26:	8682                	jr	a3
+   
+   22eb8:	0082b283          	ld	t0,8(t0)
+   22ebc:	000e0067          	jr	t3
+
+   55858:	82ce                	mv	t0,s3
+   5585a:	050a                	slli	a0,a0,0x2
+   5585c:	956e                	add	a0,a0,s11
+   5585e:	24052503          	lw	a0,576(a0)
+   55862:	9536                	add	a0,a0,a3
+   55864:	8502                	jr	a0
+
+
+   41010:	038a3783          	ld	a5,56(s4)
+   41014:	8662                	mv	a2,s8
+   41016:	85da                	mv	a1,s6
+   41018:	8526                	mv	a0,s1
+   4101a:	9782                	jalr	a5

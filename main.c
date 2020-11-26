@@ -32,7 +32,7 @@ void start_jop(void *stackbuf);
 
 int main() {
 	setbuf(stdout, NULL);
-	FILE *stack_buf_fd = fopen("stackbuf.txt", "r");
-	void *stack_buf = fill_buf((void*)0x10000000, stack_buf_fd);
-	start_jop(stack_buf);
+	FILE *dispatch_buf_fd = fopen("dispatch.txt", "r");
+	void *dispatch_buf = fill_buf((void*)0x20000000, dispatch_buf_fd);
+	start_jop(dispatch_buf);
 }
