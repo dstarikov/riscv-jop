@@ -138,7 +138,7 @@ Loads s1 into a0, jumps to s2
 
    55e24:	82ce                	mv	t0,s3
    55e26:	8682                	jr	a3
-   
+
    22eb8:	0082b283          	ld	t0,8(t0)
    22ebc:	000e0067          	jr	t3
 
@@ -149,6 +149,10 @@ Loads s1 into a0, jumps to s2
    55862:	9536                	add	a0,a0,a3
    55864:	8502                	jr	a0
 
+   30bf0:	9efa                	add	t4,t4,t5
+   30bf2:	000eae03          	lw	t3,0(t4)
+   30bf6:	9e7a                	add	t3,t3,t5
+   30bf8:	8e02                	jr	t3
 
    41010:	038a3783          	ld	a5,56(s4)
    41014:	8662                	mv	a2,s8
