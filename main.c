@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <sys/mman.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 void *fill_buf(void *location, FILE *fd) {
 	uint64_t *buf = mmap((void*)location, 0x10000000, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANON, -1, 0);
@@ -33,15 +34,5 @@ int main() {
 	setbuf(stdout, NULL);
 	FILE *stack_buf_fd = fopen("stackbuf.txt", "r");
 	void *stack_buf = fill_buf((void*)0x10000000, stack_buf_fd);
-
-	FILE *jmp_buf_fd = fopen("jmpbuf.txt", "r");
-	void *jmp_buf = fill_buf((void*)0x20000000, jmp_buf_fd);
-
-	uint64_t *scratch_buf = mmap((void*)0x30000000, 0x10000000, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANON, -1, 0);
-	if((uint64_t) scratch_buf != 0x30000000) {
-		printf("could not allocate scratch buffer\n");
-		exit(1);
-	}
-
 	start_jop(stack_buf);
 }
