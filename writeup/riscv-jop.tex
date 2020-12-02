@@ -52,6 +52,9 @@
 \documentclass[letterpaper,twocolumn,10pt]{article}
 \usepackage{usenix-2020-09}
 
+% for urls
+\usepackage{hyperref}
+
 % to be able to draw some self-contained figs
 \usepackage{tikz}
 \usepackage{amsmath}
@@ -110,6 +113,50 @@
     pages={216--230},
     year={1998}
 }
+@inproceedings{checkoway10ropnoret,
+    author = {Checkoway, Stephen and Davi, Lucas and Dmitrienko, Alexandra and Sadeghi, Ahmad-Reza and Shacham, Hovav and Winandy, Marcel},
+    title = {{Return}-{Oriented} {Programming} without {Returns}},
+    year = {2010},
+    isbn = {9781450302456},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/1866307.1866370},
+    doi = {10.1145/1866307.1866370},
+    abstract = {We show that on both the x86 and ARM architectures it is possible to mount return-oriented programming attacks without using return instructions. Our attacks instead make use of certain instruction sequences that behave like a return, which occur with sufficient frequency in large libraries on (x86) Linux and (ARM) Android to allow creation of Turing-complete gadget sets.Because they do not make use of return instructions, our new attacks have negative implications for several recently proposed classes of defense against return-oriented programming: those that detect the too-frequent use of returns in the instruction stream; those that detect violations of the last-in, first-out invariant normally maintained for the return-address stack; and those that modify compilers to produce code that avoids the return instruction.},
+    booktitle = {Proceedings of the 17th ACM Conference on Computer and Communications Security},
+    pages = {559–572},
+    numpages = {14},
+    keywords = {return-oriented programming, arm, x86},
+    location = {Chicago, Illinois, USA},
+    series = {CCS '10}
+}
+@inproceedings{sadeghi15tinyjop,
+    author = {Sadeghi, Ali-Akbar and Aminmansour, Farzane and Shahriari, Hamid-Reza},
+    year = {2015},
+    month = {09},
+    pages = {52-57},
+    title = {{Tiny} jump-oriented programming attack ({A} class of code reuse attacks)},
+    doi = {10.1109/ISCISC.2015.7387898}
+}
+@inbook{jaloyan20ropriscv,
+    author = {Jaloyan, Georges-Axel and Markantonakis, Konstantinos and Akram, Raja Naeem and Robin, David and Mayes, Keith and Naccache, David},
+    title = {{Return}-{Oriented} {Programming} on {RISC-V}},
+    year = {2020},
+    isbn = {9781450367509},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3320269.3384738},
+    abstract = {This paper provides the first analysis on the feasibility of Return-Oriented programming (ROP) on RISC-V, a new instruction set architecture targeting embedded systems. We show the existence of a new class of gadgets, using several Linear Code Sequences And Jumps (LCSAJ), undetected by current Galileo-based ROP gadget searching tools. We argue that this class of gadgets is rich enough on RISC-V to mount complex ROP attacks, bypassing traditional mitigation like DEP, ASLR, stack canaries, G-Free and some compiler-based backward-edge CFI, by jumping over any guard inserted by a compiler to protect indirect jump instructions. We provide examples of such gadgets, as well as a proof-of-concept ROP chain, using C code injection to leverage a privilege escalation attack on two standard Linux operating systems. Additionally, we discuss some of the required mitigations to prevent such attacks and provide a new ROP gadget finder algorithm that handles this new class of gadgets.},
+    booktitle = {Proceedings of the 15th ACM Asia Conference on Computer and Communications Security},
+    pages = {471–480},
+    numpages = {10}
+}
+@manual{riscvmanual,
+    author = {Waterman, Andrew and Asanovic, Krste},
+    title = {{The} {RISC-V} {Instruction} {Set} {Manual}, {Volume} {I}: {User}-{Level} {ISA}, {Document} {Version} {20191213}},
+    note = {\url{https://github.com/riscv/riscv-isa-manual}}
+}
+
 
 \end{filecontents}
 
