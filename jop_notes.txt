@@ -159,3 +159,15 @@ Loads s1 into a0, jumps to s2
    41016:	85da                	mv	a1,s6
    41018:	8526                	mv	a0,s1
    4101a:	9782                	jalr	a5
+
+
+   b38a6:	7342                	ld	t1,48(sp)
+   b38a8:	87d6                	mv	a5,s5
+   b38aa:	88ca                	mv	a7,s2
+   b38ac:	00448833          	add	a6,s1,tp
+   b38b0:	8762                	mv	a4,s8
+   b38b2:	86d2                	mv	a3,s4
+   b38b4:	865e                	mv	a2,s7
+   b38b6:	85ce                	mv	a1,s3
+   b38b8:	855a                	mv	a0,s6
+   b38ba:	9302                	jalr	t1
