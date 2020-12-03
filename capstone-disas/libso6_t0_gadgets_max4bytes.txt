@@ -1,0 +1,638 @@
+0x2334e:	8282    		c.jr	t0	(2 bytes)
+
+0x2334c:	7d55    		c.li	a0, -1	(2 bytes)
+0x2334e:	8282    		c.jr	t0	(2 bytes)
+
+0x27d8e:	1687    		c.mv	a4, t0	(2 bytes)
+0x27d90:	8db7    		c.j	-0x9e	(2 bytes)
+
+0x2945c:	ef4223a0		jal	t0, -0xcbdfe	(4 bytes)
+
+0x2d360:	e7029c63		jalr	t0, s8, 0x639	(4 bytes)
+
+0x2db66:	8902    		c.addi	t0, 2	(2 bytes)
+0x2db68:	89b7    		c.j	-0xbe	(2 bytes)
+
+0x2db6c:	a902    		c.addi	t0, 0xa	(2 bytes)
+0x2db6e:	35bf    		c.j	-0xc4	(2 bytes)
+
+0x2dbb4:	8902    		c.addi	t0, 2	(2 bytes)
+0x2dbb6:	d5bd    		c.j	-0x10c	(2 bytes)
+
+0x2dbc0:	8902    		c.addi	t0, 2	(2 bytes)
+0x2dbc2:	e5b5    		c.j	-0x118	(2 bytes)
+
+0x2dbcc:	8902    		c.addi	t0, 2	(2 bytes)
+0x2dbce:	f1bd    		c.j	-0x124	(2 bytes)
+
+0x3030c:	f902    		c.addi	t0, 0x1e	(2 bytes)
+0x3030e:	19bf    		c.j	-0xea	(2 bytes)
+
+0x30a3e:	e7020d47		jalr	t0, s10, 0x470	(4 bytes)
+
+0x311ca:	e7022946		jalr	t0, s2, 0x462	(4 bytes)
+
+0x31410:	e7020875		jalr	t0, a6, 0x750	(4 bytes)
+
+0x316d8:	e7021306		jalr	t0, t1, 0x61	(4 bytes)
+
+0x31df4:	b522    		c.addiw	t0, 0xd	(2 bytes)
+0x31df6:	8280    		c.jr	ra	(2 bytes)
+
+0x34e78:	e7020d67		jalr	t0, s10, 0x670	(4 bytes)
+
+0x34ec4:	e7020d66		jalr	t0, s10, 0x660	(4 bytes)
+
+0x34ed8:	e7029bd7		jalr	t0, s6, -0x287	(4 bytes)
+
+0x34ed8:	e7029bd7		jalr	t0, s6, -0x287	(4 bytes)
+
+0x3785c:	ef0213dd		jal	t0, -0xcf230	(4 bytes)
+
+0x3812c:	e7023ea0		jalr	t0, t3, -0x5fd	(4 bytes)
+
+0x3889a:	a522    		c.addiw	t0, 9	(2 bytes)
+0x3889c:	6dbb    		c.j	-0x246	(2 bytes)
+
+0x3908c:	e782c147		jalr	t0, gp, 0x47c	(4 bytes)
+
+0x3984c:	ef0213dd		jal	t0, -0xcf230	(4 bytes)
+
+0x3b468:	96fa    		c.sdsp	t0, 0x170(sp)	(2 bytes)
+0x3b46a:	89b3    		c.j	-0x2be	(2 bytes)
+
+0x3cd46:	a262    		c.ldsp	t0, 8(sp)	(2 bytes)
+0x3cd48:	f9b5    		c.j	-0x132	(2 bytes)
+
+0x3dbfc:	8602    		c.slli	t0, 1	(2 bytes)
+0x3dbfe:	e9b6    		c.j	-0x436	(2 bytes)
+
+0x3dc90:	8942    		c.li	t0, 2	(2 bytes)
+0x3dc92:	1dbe    		c.j	-0x4ca	(2 bytes)
+
+0x3df32:	8142    		c.li	t0, 0	(2 bytes)
+0x3df34:	05b3    		c.j	-0x2e0	(2 bytes)
+
+0x3f3b6:	e152    		c.li	t0, -8	(2 bytes)
+0x3f3b8:	91a8    		c.j	0x54	(2 bytes)
+
+0x4060c:	e70283c8		jalr	t0, t1, -0x378	(4 bytes)
+
+0x4060c:	e70283c8		jalr	t0, t1, -0x378	(4 bytes)
+
+0x40bb8:	f142    		c.li	t0, 0x1c	(2 bytes)
+0x40bba:	c1bf    		c.j	-0x30	(2 bytes)
+
+0x41082:	e7021387		jalr	t0, t1, -0x78f	(4 bytes)
+
+0x41204:	e702630a		jalr	t0, t1, 0xa6	(4 bytes)
+
+0x41204:	e702630a		jalr	t0, t1, 0xa6	(4 bytes)
+
+0x429ec:	2a20    		c.fldsp	ft0, 0x88(sp)	(2 bytes)
+0x429ee:	09a8    		c.j	0x12	(2 bytes)
+
+0x455a8:	e572    		c.lui	t0, 0xffff9	(2 bytes)
+0x455aa:	85b5    		c.j	-0x1a0	(2 bytes)
+
+0x48028:	eff26a85		jal	t0, -0x50faa	(4 bytes)
+
+0x491dc:	e7021b87		jalr	t0, s6, -0x78f	(4 bytes)
+
+0x491dc:	e7021b87		jalr	t0, s6, -0x78f	(4 bytes)
+
+0x49224:	e7029307		jalr	t0, t1, 0x79	(4 bytes)
+
+0x4a07c:	e702fd5c		jalr	t0, s10, 0x5cf	(4 bytes)
+
+0x4b800:	efd20327		jal	t0, 0x3d270	(4 bytes)
+
+0x4d7ba:	f142    		c.li	t0, 0x1c	(2 bytes)
+0x4d7bc:	c1bf    		c.j	-0x30	(2 bytes)
+
+0x4d83c:	e7021387		jalr	t0, t1, -0x78f	(4 bytes)
+
+0x4f3d0:	e7021387		jalr	t0, t1, -0x78f	(4 bytes)
+
+0x4fc04:	efb26fd0		jal	t0, -0x4afa	(4 bytes)
+
+0x4fc04:	efb26fd0		jal	t0, -0x4afa	(4 bytes)
+
+0x50ba6:	8542    		c.li	t0, 1	(2 bytes)
+0x50ba8:	8286    		c.jr	a3	(2 bytes)
+
+0x5469e:	8602    		c.slli	t0, 1	(2 bytes)
+0x546a0:	fdbe    		c.j	-0x402	(2 bytes)
+
+0x5471e:	8602    		c.slli	t0, 1	(2 bytes)
+0x54720:	f5b6    		c.j	-0x414	(2 bytes)
+
+0x5577a:	8142    		c.li	t0, 0	(2 bytes)
+0x5577c:	0285    		c.jr	a0	(2 bytes)
+
+0x55e24:	ce82    		c.mv	t0, s3	(2 bytes)
+0x55e26:	8286    		c.jr	a3	(2 bytes)
+
+0x567e8:	8502    		c.addi	t0, 1	(2 bytes)
+0x567ea:	f1b4    		c.j	-0x534	(2 bytes)
+
+0x57950:	e7022685		jalr	t0, a2, -0x7ae	(4 bytes)
+
+0x57c00:	e7021307		jalr	t0, t1, 0x71	(4 bytes)
+
+0x5879c:	e702e260		jalr	t0, tp, 0x60e	(4 bytes)
+
+0x58de4:	e702ef80		jalr	t0, t5, -0x7f2	(4 bytes)
+
+0x58fc2:	e7029c7c		jalr	t0, s8, 0x7c9	(4 bytes)
+
+0x5923c:	e7029707		jalr	t0, a4, 0x79	(4 bytes)
+
+0x5923c:	e7029707		jalr	t0, a4, 0x79	(4 bytes)
+
+0x596ec:	e7023c64		jalr	t0, s8, 0x643	(4 bytes)
+
+0x59c0e:	e702bc74		jalr	t0, s8, 0x74b	(4 bytes)
+
+0x5a83e:	e7029c7c		jalr	t0, s8, 0x7c9	(4 bytes)
+
+0x5b478:	e7029c70		jalr	t0, s8, 0x709	(4 bytes)
+
+0x5b4de:	e7022285		jalr	t0, tp, -0x7ae	(4 bytes)
+
+0x5ba38:	e7029c78		jalr	t0, s8, 0x789	(4 bytes)
+
+0x5bd86:	efd2dc70		jal	t0, 0xcdf0c	(4 bytes)
+
+0x5eb28:	e702e260		jalr	t0, tp, 0x60e	(4 bytes)
+
+0x5f9d2:	e70283b7		jalr	t0, t1, -0x488	(4 bytes)
+
+0x60792:	e70203c5		jalr	t0, t1, -0x3b0	(4 bytes)
+
+0x60792:	e70203c5		jalr	t0, t1, -0x3b0	(4 bytes)
+
+0x60afc:	e702dc64		jalr	t0, s8, 0x64d	(4 bytes)
+
+0x61d0e:	e7029c70		jalr	t0, s8, 0x709	(4 bytes)
+
+0x621fe:	e7029c78		jalr	t0, s8, 0x789	(4 bytes)
+
+0x623b4:	e702833d		jalr	t0, t1, 0x3d8	(4 bytes)
+
+0x6423a:	e70223b0		jalr	t0, t1, -0x4fe	(4 bytes)
+
+0x6423a:	e70223b0		jalr	t0, t1, -0x4fe	(4 bytes)
+
+0x6427e:	e70223b8		jalr	t0, t1, -0x47e	(4 bytes)
+
+0x64a40:	efb22330		jal	t0, 0x3b302	(4 bytes)
+
+0x65e2a:	e602    		c.slli	t0, 0x19	(2 bytes)
+0x65e2c:	bda8    		c.j	0x7e	(2 bytes)
+
+0x66954:	efc21386		jal	t0, -0xc37a0	(4 bytes)
+
+0x66954:	efc21386		jal	t0, -0xc37a0	(4 bytes)
+
+0x682fc:	9902    		c.addi	t0, 6	(2 bytes)
+0x682fe:	3dbf    		c.j	-0xc2	(2 bytes)
+
+0x6897a:	e7029304		jalr	t0, t1, 0x49	(4 bytes)
+
+0x69cd0:	efc24111		jal	t0, 0x1c114	(4 bytes)
+
+0x6a002:	e7020d47		jalr	t0, s10, 0x470	(4 bytes)
+
+0x6b4e2:	e7021307		jalr	t0, t1, 0x71	(4 bytes)
+
+0x6b50a:	e7029bd7		jalr	t0, s6, -0x287	(4 bytes)
+
+0x6b50a:	e7029bd7		jalr	t0, s6, -0x287	(4 bytes)
+
+0x6c9a4:	e7028dcf		jalr	t0, s10, -0x308	(4 bytes)
+
+0x6c9b2:	e70295c7		jalr	t0, a0, -0x387	(4 bytes)
+
+0x6c9c0:	e70299cf		jalr	t0, s2, -0x307	(4 bytes)
+
+0x6d3e8:	e702b387		jalr	t0, t1, -0x785	(4 bytes)
+
+0x6d70e:	fd12    		c.addi	t0, -1	(2 bytes)
+0x6d710:	2db3    		c.j	-0x2d6	(2 bytes)
+
+0x6da22:	e7023375		jalr	t0, t1, 0x753	(4 bytes)
+
+0x6e108:	e7020337		jalr	t0, t1, 0x370	(4 bytes)
+
+0x6efc4:	1686    		c.mv	a2, t0	(2 bytes)
+0x6efc6:	0db7    		c.j	-0xde	(2 bytes)
+
+0x6ffe4:	8902    		c.addi	t0, 2	(2 bytes)
+0x6ffe6:	a9bf    		c.j	-0xa6	(2 bytes)
+
+0x700be:	8902    		c.addi	t0, 2	(2 bytes)
+0x700c0:	55b7    		c.j	-0x5c	(2 bytes)
+
+0x7037c:	8902    		c.addi	t0, 2	(2 bytes)
+0x7037e:	15bf    		c.j	-0xcc	(2 bytes)
+
+0x7129e:	e7023ea0		jalr	t0, t3, -0x5fd	(4 bytes)
+
+0x71e8e:	8142    		c.li	t0, 0	(2 bytes)
+0x71e90:	f9ae    		c.j	0x3de	(2 bytes)
+
+0x71ed4:	a522    		c.addiw	t0, 9	(2 bytes)
+0x71ed6:	6dbb    		c.j	-0x246	(2 bytes)
+
+0x71ee6:	8e82    		c.mv	t0, gp	(2 bytes)
+0x71ee8:	b9b0    		c.j	-0x7b2	(2 bytes)
+
+0x722fa:	8142    		c.li	t0, 0	(2 bytes)
+0x722fc:	8dbf    		c.j	-0x8e	(2 bytes)
+
+0x72534:	9686    		c.mv	a3, t0	(2 bytes)
+0x72536:	5db7    		c.j	-0x5a	(2 bytes)
+
+0x729c6:	8542    		c.li	t0, 1	(2 bytes)
+0x729c8:	5db0    		c.j	-0x75a	(2 bytes)
+
+0x72af2:	ce82    		c.mv	t0, s3	(2 bytes)
+0x72af4:	41bb    		c.j	-0x270	(2 bytes)
+
+0x73f82:	8142    		c.li	t0, 0	(2 bytes)
+0x73f84:	15a3    		c.j	0x524	(2 bytes)
+
+0x74550:	8142    		c.li	t0, 0	(2 bytes)
+0x74552:	99bf    		c.j	-0xaa	(2 bytes)
+
+0x748ac:	168e    		c.mv	t3, t0	(2 bytes)
+0x748ae:	e5bd    		c.j	-0x108	(2 bytes)
+
+0x762ec:	8142    		c.li	t0, 0	(2 bytes)
+0x762ee:	d9ae    		c.j	0x3d6	(2 bytes)
+
+0x76750:	8142    		c.li	t0, 0	(2 bytes)
+0x76752:	8dbf    		c.j	-0x8e	(2 bytes)
+
+0x7697a:	9686    		c.mv	a3, t0	(2 bytes)
+0x7697c:	5db7    		c.j	-0x5a	(2 bytes)
+
+0x76de4:	efb2b685		jal	t0, -0x947a6	(4 bytes)
+
+0x76dfe:	8542    		c.li	t0, 1	(2 bytes)
+0x76e00:	d1b0    		c.j	-0x73c	(2 bytes)
+
+0x76f26:	ca82    		c.mv	t0, s2	(2 bytes)
+0x76f28:	61bb    		c.j	-0x268	(2 bytes)
+
+0x77300:	e70291c0		jalr	t0, sp, -0x3f7	(4 bytes)
+
+0x7764c:	e7028277		jalr	t0, tp, 0x778	(4 bytes)
+
+0x7803a:	1687    		c.mv	a4, t0	(2 bytes)
+0x7803c:	c1bf    		c.j	-0x30	(2 bytes)
+
+0x787ea:	ca92    		c.add	t0, s2	(2 bytes)
+0x787ec:	a1bf    		c.j	-0xa8	(2 bytes)
+
+0x78b68:	1686    		c.mv	a2, t0	(2 bytes)
+0x78b6a:	0da0    		c.j	0x22	(2 bytes)
+
+0x79c6a:	ca72    		c.ldsp	t0, 0xb0(sp)	(2 bytes)
+0x79c6c:	d5b5    		c.j	-0x11c	(2 bytes)
+
+0x7a6c6:	e7022267		jalr	t0, tp, 0x672	(4 bytes)
+
+0x7a7da:	e7022167		jalr	t0, sp, 0x672	(4 bytes)
+
+0x7a800:	e70263cf		jalr	t0, t1, -0x30a	(4 bytes)
+
+0x7a800:	e70263cf		jalr	t0, t1, -0x30a	(4 bytes)
+
+0x7a80a:	e7021ce4		jalr	t0, s8, -0x1bf	(4 bytes)
+
+0x7a826:	e70214e0		jalr	t0, s0, -0x1ff	(4 bytes)
+
+0x7a8a4:	e7021845		jalr	t0, a6, 0x451	(4 bytes)
+
+0x7c0fe:	e902    		c.addi	t0, 0x1a	(2 bytes)
+0x7c100:	19bd    		c.j	-0x1ea	(2 bytes)
+
+0x7c42e:	e7022266		jalr	t0, tp, 0x662	(4 bytes)
+
+0x7c6f6:	e70283e7		jalr	t0, t1, -0x188	(4 bytes)
+
+0x7c7ce:	e70213b7		jalr	t0, t1, -0x48f	(4 bytes)
+
+0x7c8e4:	e7028326		jalr	t0, t1, 0x268	(4 bytes)
+
+0x7ff70:	fd02    		c.addi	t0, 0x1f	(2 bytes)
+0x7ff72:	21ba    		c.j	-0x6e8	(2 bytes)
+
+0x800d2:	f502    		c.addi	t0, 0x1d	(2 bytes)
+0x800d4:	65bc    		c.j	-0x548	(2 bytes)
+
+0x80134:	e7028e07		jalr	t0, t3, 0x78	(4 bytes)
+
+0x801ba:	e7028e07		jalr	t0, t3, 0x78	(4 bytes)
+
+0x807f4:	e7028e07		jalr	t0, t3, 0x78	(4 bytes)
+
+0x80828:	1694    		c.add	s0, t0	(2 bytes)
+0x8082a:	7db2    		c.j	-0x652	(2 bytes)
+
+0x80b18:	e7028e07		jalr	t0, t3, 0x78	(4 bytes)
+
+0x8123e:	d282    		c.mv	t0, s4	(2 bytes)
+0x81240:	75bf    		c.j	-0x44	(2 bytes)
+
+0x817d6:	9699    		c.add	s3, t0	(2 bytes)
+0x817d8:	ddb0    		c.j	-0x71a	(2 bytes)
+
+0x8230c:	e70211b5		jalr	t0, sp, -0x4af	(4 bytes)
+
+0x8230c:	e70211b5		jalr	t0, sp, -0x4af	(4 bytes)
+
+0x82366:	e702b303		jalr	t0, t1, 0x3b	(4 bytes)
+
+0x8250e:	e702b303		jalr	t0, t1, 0x3b	(4 bytes)
+
+0x83830:	e702ca86		jalr	t0, s4, -0x794	(4 bytes)
+
+0x83d06:	e702ca86		jalr	t0, s4, -0x794	(4 bytes)
+
+0x84f94:	e702b387		jalr	t0, t1, -0x785	(4 bytes)
+
+0x8528c:	e702b387		jalr	t0, t1, -0x785	(4 bytes)
+
+0x864b6:	8102    		c.addi	t0, 0	(2 bytes)
+0x864b8:	3da0    		c.j	0x2e	(2 bytes)
+
+0x8671a:	8102    		c.addi	t0, 0	(2 bytes)
+0x8671c:	3da0    		c.j	0x2e	(2 bytes)
+
+0x86aa6:	e702c1f7		jalr	t0, sp, -0x84	(4 bytes)
+
+0x874bc:	e70223b8		jalr	t0, t1, -0x47e	(4 bytes)
+
+0x874bc:	e70223b8		jalr	t0, t1, -0x47e	(4 bytes)
+
+0x87ea8:	e7028280		jalr	t0, tp, -0x7f8	(4 bytes)
+
+0x87ea8:	e7028280		jalr	t0, tp, -0x7f8	(4 bytes)
+
+0x87eb4:	e7026353		jalr	t0, t1, 0x536	(4 bytes)
+
+0x87eb4:	e7026353		jalr	t0, t1, 0x536	(4 bytes)
+
+0x87fa0:	e7023705		jalr	t0, a4, 0x53	(4 bytes)
+
+0x89cb8:	e702636a		jalr	t0, t1, 0x6a6	(4 bytes)
+
+0x89cb8:	e702636a		jalr	t0, t1, 0x6a6	(4 bytes)
+
+0x8caf8:	e7028347		jalr	t0, t1, 0x478	(4 bytes)
+
+0x8caf8:	e7028347		jalr	t0, t1, 0x478	(4 bytes)
+
+0x8cb18:	e7028547		jalr	t0, a0, 0x478	(4 bytes)
+
+0x8cd44:	e702b707		jalr	t0, a4, 0x7b	(4 bytes)
+
+0x8cd44:	e702b707		jalr	t0, a4, 0x7b	(4 bytes)
+
+0x8ce3a:	e7027d57		jalr	t0, s10, 0x577	(4 bytes)
+
+0x8d690:	dd02    		c.addi	t0, 0x17	(2 bytes)
+0x8d692:	9db1    		c.j	-0x39a	(2 bytes)
+
+0x8d76e:	dd02    		c.addi	t0, 0x17	(2 bytes)
+0x8d770:	81bb    		c.j	-0x2b0	(2 bytes)
+
+0x8db2e:	e7021869		jalr	t0, a6, 0x691	(4 bytes)
+
+0x8ff68:	e7029868		jalr	t0, a6, 0x689	(4 bytes)
+
+0x909d6:	e70283b7		jalr	t0, t1, -0x488	(4 bytes)
+
+0x918f4:	e7020337		jalr	t0, t1, 0x370	(4 bytes)
+
+0x91e0e:	e7029b85		jalr	t0, s6, -0x7a7	(4 bytes)
+
+0x91e0e:	e7029b85		jalr	t0, s6, -0x7a7	(4 bytes)
+
+0x9274a:	ef121b0b		jal	t0, 0xb18b0	(4 bytes)
+
+0x9274a:	ef121b0b		jal	t0, 0xb18b0	(4 bytes)
+
+0x9340a:	e70223a0		jalr	t0, t1, -0x5fe	(4 bytes)
+
+0x9495c:	fa02    		c.slli	t0, 0x1e	(2 bytes)
+0x9495e:	1dbf    		c.j	-0xca	(2 bytes)
+
+0x94d86:	fa02    		c.slli	t0, 0x1e	(2 bytes)
+0x94d88:	bdbe    		c.j	-0x482	(2 bytes)
+
+0x99a56:	e7028348		jalr	t0, t1, 0x488	(4 bytes)
+
+0x99af2:	e70223aa		jalr	t0, t1, -0x55e	(4 bytes)
+
+0x99af2:	e70223aa		jalr	t0, t1, -0x55e	(4 bytes)
+
+0x99ba6:	e7020111		jalr	t0, sp, 0x110	(4 bytes)
+
+0x99ecc:	f902    		c.addi	t0, 0x1e	(2 bytes)
+0x99ece:	99bf    		c.j	-0xaa	(2 bytes)
+
+0x9acb8:	fd02    		c.addi	t0, 0x1f	(2 bytes)
+0x9acba:	51b3    		c.j	-0x27c	(2 bytes)
+
+0x9adba:	cd02    		c.addi	t0, 0x13	(2 bytes)
+0x9adbc:	05bf    		c.j	-0xd0	(2 bytes)
+
+0x9b82e:	e7026a86		jalr	t0, s4, -0x79a	(4 bytes)
+
+0x9bb4c:	e7022330		jalr	t0, t1, 0x302	(4 bytes)
+
+0x9bb80:	e7022330		jalr	t0, t1, 0x302	(4 bytes)
+
+0x9d90c:	e7024a67		jalr	t0, s4, 0x674	(4 bytes)
+
+0x9eb26:	e7028327		jalr	t0, t1, 0x278	(4 bytes)
+
+0x9ec3e:	e7028327		jalr	t0, t1, 0x278	(4 bytes)
+
+0xa0dda:	e7022967		jalr	t0, s2, 0x672	(4 bytes)
+
+0xa1b56:	e7023008		jalr	t0, zero, 0x83	(4 bytes)
+
+0xa1b5c:	e7023747		jalr	t0, a4, 0x473	(4 bytes)
+
+0xa1b5c:	e7023747		jalr	t0, a4, 0x473	(4 bytes)
+
+0xa1b6a:	e7023ef0		jalr	t0, t3, -0xfd	(4 bytes)
+
+0xa1d10:	e7023b09		jalr	t0, s6, 0x93	(4 bytes)
+
+0xa1d7a:	e7021de4		jalr	t0, s10, -0x1bf	(4 bytes)
+
+0xa1e72:	e7023b09		jalr	t0, s6, 0x93	(4 bytes)
+
+0xa1edc:	e7021de4		jalr	t0, s10, -0x1bf	(4 bytes)
+
+0xa23c6:	e7029308		jalr	t0, t1, 0x89	(4 bytes)
+
+0xa2450:	e7029308		jalr	t0, t1, 0x89	(4 bytes)
+
+0xa36d6:	e7023810		jalr	t0, a6, 0x103	(4 bytes)
+
+0xa3702:	e7022277		jalr	t0, tp, 0x772	(4 bytes)
+
+0xa9f4a:	e70263f8		jalr	t0, t1, -0x7a	(4 bytes)
+
+0xaa516:	e702b3f7		jalr	t0, t1, -0x85	(4 bytes)
+
+0xaa51a:	e70223b0		jalr	t0, t1, -0x4fe	(4 bytes)
+
+0xaa9d8:	e7869297		jalr	a3, t0, -0x687	(4 bytes)
+
+0xac48c:	8102    		c.addi	t0, 0	(2 bytes)
+0xac48e:	3da0    		c.j	0x2e	(2 bytes)
+
+0xac896:	e702e39f		jalr	t0, t1, -0x602	(4 bytes)
+
+0xac896:	e702e39f		jalr	t0, t1, -0x602	(4 bytes)
+
+0xacd4a:	e70217f4		jalr	t0, a4, -0xbf	(4 bytes)
+
+0xad6ee:	8102    		c.addi	t0, 0	(2 bytes)
+0xad6f0:	3da0    		c.j	0x2e	(2 bytes)
+
+0xb0db2:	e7028527		jalr	t0, a0, 0x278	(4 bytes)
+
+0xb1c48:	67868297		jalr	a2, t0, -0x688	(4 bytes)
+
+0xb1c48:	67868297		jalr	a2, t0, -0x688	(4 bytes)
+
+0xb1c64:	f902    		c.addi	t0, 0x1e	(2 bytes)
+0xb1c66:	b5bf    		c.j	-0x84	(2 bytes)
+
+0xb386c:	8102    		c.addi	t0, 0	(2 bytes)
+0xb386e:	0da8    		c.j	0x32	(2 bytes)
+
+0xb3ff0:	e7021840		jalr	t0, a6, 0x401	(4 bytes)
+
+0xb4326:	e7021840		jalr	t0, a6, 0x401	(4 bytes)
+
+0xb4976:	8102    		c.addi	t0, 0	(2 bytes)
+0xb4978:	3da0    		c.j	0x2e	(2 bytes)
+
+0xb4ab8:	678d6277		jalr	s10, t0, 0x776	(4 bytes)
+
+0xb506a:	8102    		c.addi	t0, 0	(2 bytes)
+0xb506c:	3da0    		c.j	0x2e	(2 bytes)
+
+0xb5422:	8102    		c.addi	t0, 0	(2 bytes)
+0xb5424:	3da0    		c.j	0x2e	(2 bytes)
+
+0xb5a4e:	8102    		c.addi	t0, 0	(2 bytes)
+0xb5a50:	3da0    		c.j	0x2e	(2 bytes)
+
+0xb5db6:	8102    		c.addi	t0, 0	(2 bytes)
+0xb5db8:	3da0    		c.j	0x2e	(2 bytes)
+
+0xb6164:	8102    		c.addi	t0, 0	(2 bytes)
+0xb6166:	3da0    		c.j	0x2e	(2 bytes)
+
+0xb7612:	1693    		c.add	t1, t0	(2 bytes)
+0xb7614:	a5b5    		c.j	-0x198	(2 bytes)
+
+0xb807a:	e7021387		jalr	t0, t1, -0x78f	(4 bytes)
+
+0xb8160:	e7021387		jalr	t0, t1, -0x78f	(4 bytes)
+
+0xb819a:	e7021387		jalr	t0, t1, -0x78f	(4 bytes)
+
+0xb9344:	ca82    		c.mv	t0, s2	(2 bytes)
+0xb9346:	71bf    		c.j	-0x64	(2 bytes)
+
+0xb9520:	8102    		c.addi	t0, 0	(2 bytes)
+0xb9522:	3da0    		c.j	0x2e	(2 bytes)
+
+0xba360:	e7029c63		jalr	t0, s8, 0x639	(4 bytes)
+
+0xba56a:	969d    		c.add	s11, t0	(2 bytes)
+0xba56c:	c9b7    		c.j	-0x3e	(2 bytes)
+
+0xbaf2a:	bd02    		c.addi	t0, 0xf	(2 bytes)
+0xbaf2c:	d5b6    		c.j	-0x41c	(2 bytes)
+
+0xbb2f4:	e70283c6		jalr	t0, t1, -0x398	(4 bytes)
+
+0xbb2f4:	e70283c6		jalr	t0, t1, -0x398	(4 bytes)
+
+0xbd236:	e7028217		jalr	t0, tp, 0x178	(4 bytes)
+
+0xbe0b6:	f112    		c.addi	t0, -4	(2 bytes)
+0xbe0b8:	61b2    		c.j	-0x678	(2 bytes)
+
+0xbe9f0:	ef92827a		jal	t0, 0x297a8	(4 bytes)
+
+0xbec30:	67839297		jalr	t1, t0, -0x687	(4 bytes)
+
+0xbf1c4:	e7022947		jalr	t0, s2, 0x472	(4 bytes)
+
+0xbf1cc:	e7024146		jalr	t0, sp, 0x464	(4 bytes)
+
+0xbf5f2:	e70217d5		jalr	t0, a4, -0x2af	(4 bytes)
+
+0xbf5f2:	e70217d5		jalr	t0, a4, -0x2af	(4 bytes)
+
+0xc0648:	a902    		c.addi	t0, 0xa	(2 bytes)
+0xc064a:	15bf    		c.j	-0xcc	(2 bytes)
+
+0xc0f06:	e7028a89		jalr	t0, s4, -0x768	(4 bytes)
+
+0xc127a:	e702ea86		jalr	t0, s4, -0x792	(4 bytes)
+
+0xc357a:	8502    		c.addi	t0, 1	(2 bytes)
+0xc357c:	8297    		c.jalr	a5	(2 bytes)
+
+0xc38f0:	e7020544		jalr	t0, a0, 0x440	(4 bytes)
+
+0xc48dc:	efa26dd1		jal	t0, -0x25aea	(4 bytes)
+
+0xc67f4:	8102    		c.addi	t0, 0	(2 bytes)
+0xc67f6:	3da0    		c.j	0x2e	(2 bytes)
+
+0xc69f8:	8102    		c.addi	t0, 0	(2 bytes)
+0xc69fa:	3da0    		c.j	0x2e	(2 bytes)
+
+0xc7c58:	f902    		c.addi	t0, 0x1e	(2 bytes)
+0xc7c5a:	71b7    		c.j	-0x74	(2 bytes)
+
+0xc8814:	e7029307		jalr	t0, t1, 0x79	(4 bytes)
+
+0xc88de:	e142    		c.li	t0, 0x18	(2 bytes)
+0xc88e0:	8297    		c.jalr	a5	(2 bytes)
+
+0xcabe0:	e78c8297		jalr	s9, t0, -0x688	(4 bytes)
+
+0xcabe0:	e78c8297		jalr	s9, t0, -0x688	(4 bytes)
+
+0xcc530:	e70299c7		jalr	t0, s2, -0x387	(4 bytes)
+
+0xcccf4:	e7020947		jalr	t0, s2, 0x470	(4 bytes)
+
+0xccdce:	e7028946		jalr	t0, s2, 0x468	(4 bytes)
+
+0xcce68:	e7028946		jalr	t0, s2, 0x468	(4 bytes)
+
+0xd0264:	8902    		c.addi	t0, 2	(2 bytes)
+0xd0266:	85bf    		c.j	-0x90	(2 bytes)
+
+0xd22ba:	c512    		c.addi	t0, -0xf	(2 bytes)
+0xd22bc:	29a0    		c.j	0xa	(2 bytes)
+
+done!
