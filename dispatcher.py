@@ -154,8 +154,8 @@ parser = argparse.ArgumentParser(description='Generate JOP exploit file for long
 parser.add_argument('-o', '--out', type=str, help='output file name', default='dispatch.txt')
 parser.add_argument('-m', '--msg', type=str, help='string to print out', default='RISC-V JOP Success')
 parser.add_argument('--buffer-size', type=int, help='size of buffer to overflow', default=10000)
-parser.add_argument('--buffer-address', type=lambda x: int(x,0), help='size of buffer to overflow', default=0x2aaaaad480)
-parser.add_argument('-e','--execve', type=ast.literal_eval, default=["/bin/bash"])
+parser.add_argument('--buffer-address', type=lambda x: int(x,0), help='address of overflowable buffer', default=0x2aaaaad480)
+parser.add_argument('-e','--execve', type=ast.literal_eval, help="python list of strings to execve: \"['/bin/bash', '-c', 'echo \\'run a script\\'; echo \\'like this\\'; /bin/bash']\"", default=["/bin/bash"])
 args = parser.parse_args()
 
 dispatch_file = open(args.out, 'w')
