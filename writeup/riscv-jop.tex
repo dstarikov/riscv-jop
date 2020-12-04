@@ -215,14 +215,19 @@ thus reducing the cycles needed per instruction and reducing the time per cycle~
 \section{Implementing Variations of ROP}
 %-------------------------------------------------------------------------------
 
-We thought it would be beneficial to recreate previously demonstrate ROP attacks
+We thought it would be beneficial to recreate previously demonstrated ROP attacks
 so that we could familiarize ourselves with the process. We began by testing the
 RISC-V ROP attack described in Gu and Shacham~\cite{gu20ropriscv}. We cloned
 their publicly available GitHub repository to our machine and successfully
-executed the ROP attack on our RISC-V VM. Next we sought to port a variant of
+replicated their ROP attack on our RISC-V VM. To replicate their attack on our VM, we
+found the exact version of \verb|libc.so| that the authors used and cross-referenced
+it with the addresses from their compiler to find their exact gadgets. We then
+implemented these gadgets in an assembly file and modified their compiler to use
+the addresses of our gadgets. With this in place we were able to successfully execute
+brainfuck programs through ROP on our VM's. Next we sought to port a variant of
 ROP, which does not use returns~\cite{checkoway10ropnoret}, from x86 to RISC-V.
 
-At first, we reused the gadgets that implemented in the aforementioned plain ROP
+At first, we reused the gadgets that we implemented in the aforementioned plain ROP
 attack. Instead of loading the return address into \verb|ra|, we modified the
 gadgets to load it into \verb|a6|. The \verb|ret| and \verb|jalr ra|
 instructions at the end of each gadget were replaced with \verb|c.jalr a6|.
@@ -233,8 +238,17 @@ concept, but it was not realistic because it relied on gadget modification that
 we manufactured.
 
 Checkoway et al. described a ``trampoline'' gadget that could be reused to
-achieve this \verb|ret|-like behavior. We searched through our \verb|libc.so.6|
-for suitable gadgets that would allow us to implement this technique.
+achieve this \verb|ret|-like behavior. We were able to successfully implement
+a simplified version of this attack using a real \verb|ret| gadget which incremented
+the stack pointer and performed a ret, allowing us to reuse the ROP gadgets that 
+relied on loading from the stack. We modified our gadgets ending with \verb|c.jalr a6|
+to no longer modify the stack pointer. We then rewrote the brainfuck to ROP compiler
+from \cite{gu20ropriscv} to use our updated JOP gadgets and chained them together
+using the new \verb|ret| gadget. Finally, we demonstrated that this could extend to a
+full ROP-without-returns attack by replacing the real \verb|ret| gadget with one
+that we wrote ourselves which increments the stack pointer and ends with an indirect jump.
+This attack is also not realistic as it relies on the modified gadgets that use the stack
+and requires an unrealistic gadget that increments the stack before performing an indirect jump.
 
 Footnotes should be places after punctuation characters, without any
 spaces between said characters and footnotes, like so.%
@@ -338,6 +352,34 @@ tex files via the shell. And \texttt{bibtex}, of course. Works for us.
 %-------------------------------------------------------------------------------
 \section{Implementing JOP}
 %-------------------------------------------------------------------------------
+
+% TODO: flesh these sections out
+First, we implemented a simplified JOP attack using only gadgets found from \verb|libc.so.6|.
+The attack is initialized by a gadget from longjmp which loads a set of registers from the stack
+and returns to the first JOP gadget in our chain. We chained together multiple JOP gadgets
+to set up the necessary registers to open a shell with the \verb|execve| function.
+
+Finally, we implemented a version of the JOP dispatch-table attack described in
+\cite{bletsch11jopx86}. We found a powerful initializer gadget in the \verb|setcontext()|
+function from \verb|libc| which loads almost all of the registers from the address
+in register \verb|t0| and before performing an indirect jump to one of those registers.
+We found dispatcher gadgets that set \verb|t0| from one of our controlled registers, 
+allowing us to prepare the dispatch table for the next call to the initializer gadget.
+From the dispatcher gadget we can then jump to a short JOP chain ending with a jump back to 
+the initializer gadget, allowing us to execute the next JOP chain.
+This allows us to trivially chain together multiple function calls by loading the
+the argument registers in the initializer gadget, preparing the next jump to the initializer,
+and jumping to the function which then returns to initializer gadget. We demonstrated this
+capability by implementing a dispatch table compiler in Python which prints arbitrary strings
+using multiple calls to \verb|putchar| before calling \verb|execve| using an array of strings
+stored in the dispatch table. We utilize this array of strings to execute arbitrary
+executables on the host machine as well as shell-scripts. We show how this can be used to run 
+a script that opens a reverse-shell to the attacker over the network.
+
+% TODO: real-world vulnerable program (setjmp)
+% TODO: limitations of not having virtual addresses - need different gadgets to setup t0 and increment it
+% TODO: we don't have any gadgets for storing data.
+% TODO: we don't have any gadgets for storing data.
 
 %-------------------------------------------------------------------------------
 \section{Discussion}
