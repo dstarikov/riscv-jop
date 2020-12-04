@@ -215,6 +215,27 @@ thus reducing the cycles needed per instruction and reducing the time per cycle~
 \section{Implementing Variations of ROP}
 %-------------------------------------------------------------------------------
 
+We thought it would be beneficial to recreate previously demonstrate ROP attacks
+so that we could familiarize ourselves with the process. We began by testing the
+RISC-V ROP attack described in Gu and Shacham~\cite{gu20ropriscv}. We cloned
+their publicly available GitHub repository to our machine and successfully
+executed the ROP attack on our RISC-V VM. Next we sought to port a variant of
+ROP, which does not use returns~\cite{checkoway10ropnoret}, from x86 to RISC-V.
+
+At first, we reused the gadgets that implemented in the aforementioned plain ROP
+attack. Instead of loading the return address into \verb|ra|, we modified the
+gadgets to load it into \verb|a6|. The \verb|ret| and \verb|jalr ra|
+instructions at the end of each gadget were replaced with \verb|c.jalr a6|.
+Since \verb|a6| was otherwise unused in our gadgets, this functionality is
+effectively the same as normal behavior with the exception that the \verb|ret|
+and \verb|jalr ra| mnemonics are never used. This was a successful proof of
+concept, but it was not realistic because it relied on gadget modification that
+we manufactured.
+
+Checkoway et al. described a ``trampoline'' gadget that could be reused to
+achieve this \verb|ret|-like behavior. We searched through our \verb|libc.so.6|
+for suitable gadgets that would allow us to implement this technique.
+
 Footnotes should be places after punctuation characters, without any
 spaces between said characters and footnotes, like so.%
 \footnote{Remember that USENIX format stopped using endnotes and is
