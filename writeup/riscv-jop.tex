@@ -156,6 +156,24 @@
     title = {{The} {RISC-V} {Instruction} {Set} {Manual}, {Volume} {I}: {User}-{Level} {ISA}, {Document} {Version} {20191213}},
     note = {\url{https://github.com/riscv/riscv-isa-manual}}
 }
+@inproceedings{fixer,
+    author={A. {De} and A. {Basu} and S. {Ghosh} and T. {Jaeger}},
+    booktitle={2019 Design, Automation   Test in Europe Conference   Exhibition (DATE)}, 
+    title={FIXER: Flow Integrity Extensions for Embedded RISC-V}, 
+    year={2019},
+    volume={},
+    number={},
+    pages={348-353},
+    doi={10.23919/DATE.2019.8714980}
+}
+@misc{zipper,
+      title={Zipper Stack: Shadow Stacks Without Shadow}, 
+      author={Jinfeng Li and Liwei Chen and Qizhen Xu and Linan Tian and Gang Shi and Kai Chen and Dan Meng},
+      year={2020},
+      eprint={1902.00888},
+      archivePrefix={arXiv},
+      primaryClass={cs.CR}
+}
 
 
 \end{filecontents}
@@ -393,13 +411,13 @@ complex chains of JOP gadgets in RISC-V is made difficult for the same reasons
 as described in \cite{bletsch11jopx86}: there is a layer of interdependency
 between JOP gadgets as certain registers need to be maintained to serve as the
 state of the dispatcher between short chains. We work around this limitation
-by using a 'super-loader' gadget which relies on a rarely-used register \verb|t0|
+by using a initializer gadget which relies on a rarely-used register \verb|t0|
 that always points to our dispatch table to load any values we want into nearly
 any register. This allows us to construct short length JOP chains before
-jumping back to this 'super-loader' in order to setup the next JOP chain.
+jumping back to th initializer gadget in order to setup the next JOP chain.
 This doesn't solve the problem of interdependency however as we now require
 that each short JOP chain moves \verb|t0| forward in the dispatch table before
-jumping back to this 'super-loader' gadget. The benefit of this 'super-loader'
+jumping back to the initializer gadget. The benefit of this initializer
 gadget is that it makes calling arbitrary functions a simple task as it provides
 full control over function-argument registers in addition to the stack-pointer and
 return address. This allows us to implement powerful attacks by simply calling
@@ -412,7 +430,7 @@ allows for variable length instructions - this is less powerful than the
 variable length instructions of x86 but still enabled us to find additional useful
 gadgets which made our attack more powerful. In our initial JOP attack, the pointer
 to the next dispatch buffer needs to be loaded into \verb|t0| before calling the
-'super-loader' gadget. This incurs a limitation of needing to know the exact
+initializer gadget. This incurs a limitation of needing to know the exact
 address at which the dispatch-table will be stored in memory when crafting the exploit.
 This is an unrealistic limitation given ASLR. We found very few usuable JOP gadgets in
 \verb|libc| that gave us to control over \verb|t0|. Searching for unintended
@@ -425,7 +443,27 @@ making our attack much more feasible against ASLR.
 %-------------------------------------------------------------------------------
 \section{Related Work}
 %-------------------------------------------------------------------------------
+There have been multiple papers investigating control-flow integreity (CFI) 
+extensions to the RISC-V ISA ~\cite{zipper,fixer}. Zipper \cite{zipper}
+implements a shadow stack to defend against ROP attacks by detecting when return
+addresses are overwritten by a buffer-overflow. This does not protect against
+purely JOP attacks which rely on jump addresses being overwritten. However, they
+do add additional protections for attacks exploiting Setjmp/Longjmp which would
+prevent our example attack against a program with a vulnerable call to 
+\verb|longjmp|.
 
+Fixer \cite{fixer} implements a tagged RISC-V architecture for CFI and also 
+uses a shadow stack to protect against overwriting return addresses. They 
+implement additional protections against forward-edge attacks such as indirect
+jumps by analyzing code both statically and at runtime to construct a control
+flow graph that acts as a policy matrix to validate jumps and function calls.
+This type of system should be effective at defending against the JOP attacks
+that we have demonstrated. One possible workaround would be to only use
+misinterpreted compressed instructions for jumps as these wouldn't be in the
+policy matrix. Being limited to only compressed instructions would greatly limit
+the effectiveness of a JOP attack. This could furthermore be defended against
+in by simply disallowing any jumps that to do not have any entries in the policy
+matrix.
 %-------------------------------------------------------------------------------
 \section{Conclusion and Future Work}
 %-------------------------------------------------------------------------------
