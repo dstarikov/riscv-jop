@@ -211,8 +211,13 @@ University of Washington
 %-------------------------------------------------------------------------------
 \begin{abstract}
 %-------------------------------------------------------------------------------
-Your abstract text goes here. Just a few facts. Whet our appetites.
-Not more than 200 words, if possible, and preferably closer to 150.
+This paper explores the viability of jump-oriented-programming (JOP) on RISC-V,
+a new open-source ISA that is gaining popularity in embedded systems. We add to
+the code reuse attack repertoire by extending variations of return-oriented-%
+programming from their initial architectures to RISC-V. We analyze \verb|libc|
+for real JOP gadgets that can be used for these attacks, and find versatile
+gadgets that allow us to trivially issue arbitrary library calls such as
+printing strings using \verb|putchar| or launching a shell using \verb|execve|.
 \end{abstract}
 
 
