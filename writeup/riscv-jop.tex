@@ -290,7 +290,7 @@ we found a gadget that achieves a similar effect.
 There is a powerful initializer gadget in the \verb|setcontext| function from
 \verb|libc|. It loads almost all%
 % TODO: \verb| | the registers in this foonote, somehow
-\footnote{gp, tp, t0, t2 are the only registers that are not set by this
+\footnote{gp, tp, t0, t2, t3, t4, t5, and t6 are the only registers that are not set by this
 initializer gadget.}
 general purpose registers from memory, based on the address in the \verb|t0|
 register, and then it jumps to the address that it just loaded into \verb|t1|.
@@ -413,7 +413,7 @@ state of the dispatcher between short chains. We work around this limitation
 by using a initializer gadget which relies on a rarely-used register \verb|t0|
 that always points to our dispatch table to load any values we want into nearly
 any register. This allows us to construct short length JOP chains before
-jumping back to th initializer gadget in order to setup the next JOP chain.
+jumping back to the initializer gadget in order to setup the next JOP chain.
 This doesn't solve the problem of interdependency however as we now require
 that each short JOP chain moves \verb|t0| forward in the dispatch table before
 jumping back to the initializer gadget. The benefit of this initializer
