@@ -371,31 +371,84 @@ tex files via the shell. And \texttt{bibtex}, of course. Works for us.
 \section{Implementing JOP}
 %-------------------------------------------------------------------------------
 
-% TODO: flesh these sections out
-First, we implemented a simplified JOP attack using only gadgets found from \verb|libc.so.6|.
-The attack is initialized by a gadget from longjmp which loads a set of registers from the stack
-and returns to the first JOP gadget in our chain. We chained together multiple JOP gadgets
-to set up the necessary registers to open a shell with the \verb|execve| function.
+In this section we describe our methodology for crafting a jump-oriented
+programming attack. In addition, we discuss its capabilities, limitations, and
+possible real-world applications. Our approach is inspired by the previous work
+on this topic by Bletsch et al.~\cite{bletsch11jopx86}. Their research was done
+on x86, so part of our work was to translate their results to work in RISC-V. In
+their findings, they describe a \textit{dispatcher} gadget and an
+\textit{initializer} gadget. A dispatcher gadget increments a register that is
+used as a pseudo-program counter and then jumps to the address stored at that
+next address. An initializer gadget loads many (or perhaps all) registers that
+the proceeding gadgets rely on. In x86, the \verb|popa| instruction loads every
+general purpose register from the stack. There is no such luxury in RISC-V, but
+we found a gadget that achieves a similar effect.
 
-Finally, we implemented a version of the JOP dispatch-table attack described in
-\cite{bletsch11jopx86}. We found a powerful initializer gadget in the \verb|setcontext()|
-function from \verb|libc| which loads almost all of the registers from the address
-in register \verb|t0| and before performing an indirect jump to one of those registers.
-We found dispatcher gadgets that set \verb|t0| from one of our controlled registers, 
-allowing us to prepare the dispatch table for the next call to the initializer gadget.
-From the dispatcher gadget we can then jump to a short JOP chain ending with a jump back to 
-the initializer gadget, allowing us to execute the next JOP chain.
-This allows us to trivially chain together multiple function calls by loading the
-the argument registers in the initializer gadget, preparing the next jump to the initializer,
-and jumping to the function which then returns to initializer gadget. We demonstrated this
-capability by implementing a dispatch table compiler in Python which prints arbitrary strings
-using multiple calls to \verb|putchar| before calling \verb|execve| using an array of strings
-stored in the dispatch table. We utilize this array of strings to execute arbitrary
-executables on the host machine as well as shell-scripts. We show how this can be used to run 
-a script that opens a reverse-shell to the attacker over the network.
+There is a powerful initializer gadget in the \verb|setcontext| function from
+\verb|libc|. It loads almost all%
+% TODO: \verb| | the registers in this foonote, somehow
+\footnote{gp, tp, t0, t2 are the only registers that are not set by this
+initializer gadget.}
+general purpose registers from memory, based on the address in the \verb|t0|
+register, and then it jumps to the address that it just loaded into \verb|t1|.
+The ability to load so many register from memory and to subsequently jump to an
+address that we can arbitrarily define makes this gadget quite versatile.
+However, before we can utilize it, we must set \verb|t0| to point to our
+dispatch table (which contains all the values that we wish to load) in memory.
+
+We found dispatcher gadgets that set \verb|t0| from one of the registers that we
+can control with our initializer gadget, and then jump to a different register
+that we control. We use one of these dispatcher gadgets as a prologue to the
+initializer gadget, as it allows us to prepare the dispatch table for the
+initializer gadget to load values from. Furthermore, we can endlessly chain
+these gadgets together by setting the source register of the next dispatcher
+gadget using the initializer gadget that precedes it. We (facetiously) refer to
+this combo as our \textit{dispatchilizer} gadget.
+
+% TODO: flesh these sections out
+\subsection{Proof of Concept}
+%-------------------------------------------------------------------------------
+
+As our initial attempt, we implemented a simplified JOP attack using only
+gadgets found from \verb|libc.so.6|. The attack is initialized by a gadget from
+\verb|longjmp| which loads a set of registers from the stack and returns to the
+first JOP gadget in our chain. We chained together multiple JOP gadgets to set
+up the necessary registers to open a shell with the \verb|execve| function.
+
+Next, we implemented a version of the JOP dispatch-table attack described in
+\cite{bletsch11jopx86}. We made use of the dispatchilizer gadget that we
+previously described. After the first use of the dispatchilizer, we can jump to
+a short JOP chain that ends with a jump back to the dispatchilizer, allowing us
+to execute the next JOP chain. This allows us to trivially chain together
+multiple function calls by loading the the argument registers (\verb|a0-7|) in
+the initializer portion, preparing the next jump to the dispatchilizer, and
+jumping to the function which then returns to dispatchilizer. 
+
+We demonstrated this capability by implementing a dispatch table compiler in
+Python which prints arbitrary strings using multiple calls to \verb|putchar|
+before calling \verb|execve| using an array of strings stored in the dispatch
+table. Furthermore, we utilize this array of strings to execute arbitrary
+executables on the host machine as well as shell-scripts. We show how this can
+be used to run a script that opens a reverse-shell to the attacker over the
+network.
 
 % TODO: real-world vulnerable program (setjmp)
-% TODO: limitations of not having virtual addresses - need different gadgets to setup t0 and increment it
+
+\subsection{Limitations}
+%-------------------------------------------------------------------------------
+
+In order to start this attack we need the ability to set \verb|t0| to our first
+dispatch table. Next, we need a way to store the to-be-loaded values in memory.
+Finally, as with any attack that targets the control flow of a program, we need
+to redirect execution to our dispatchilizer gadget, or at least the initializer
+portion of it.
+
+In the current state of our attack, we need the virtual addresses of the
+gadgets we use ahead of time. While this means our attack could be thwarted by
+ASLR, there are a number of ways to get around this that we consider out of
+scope for our research.
+
+
 % TODO: we don't have any gadgets for storing data.
 % TODO: we don't have any gadgets for storing data.
 
