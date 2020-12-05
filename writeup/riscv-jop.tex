@@ -395,6 +395,88 @@ ASLR, there are a number of ways to get around this that we consider out of
 scope for our research.
 
 
+\subsection{C Extension and Misinterpretation}
+%-------------------------------------------------------------------------------
+
+The standard extensions of RISC-V---IMAFD, collectively identified as ``G''---%
+utilize exclusively 32-bit instructions. As such, instructions are required to
+be 4-byte aligned. If a branch or a jump leads to an address that is not 4-byte
+aligned, then an instruction address misaligned exception is raised~%
+\cite{riscvmanual}. The C extension of RISC-V introduces 16-bit alternatives for
+common instructions. Some examples are when one of the registers is \verb|zero|,
+\verb|ra|, or \verb|sp|, and when the first source register and the destination
+register are identical. This extension reduces aforementioned 4-byte instruction
+alignment requirement to 2 bytes, in order to allow for better code density.
+
+This relaxed requirement also allows the ability to misinterpret instructions.
+One example is that the latter 16 bites of a 32-bit instruction, in conjunction
+with the first 16 bits of the following instruction, could be interpreted as
+a valid, unintended 32-bit instruction. Another way this can occur is if the
+latter 16 bits of a 32-bit instruction encode a valid 16-bit instruction from
+the C extension.
+
+Due to the limited possible sizes of RISC-V instructions, this misinterpretation
+is nowhere near as effective as that described in Shacham's original ROP
+paper~\cite{shacham07ropx86}. However, Jaloyan et al. demonstrate that overlapping
+instruction caused by such misinterpretation can still be utilized in an
+attack\cite{jaloyan20ropriscv}. We also make use of this strategy to look for
+additional jump-based gadget to add to our repertoire.
+
+In order to search for these gadgets, we re-implemented the Galileo algorithm
+described in \cite{shacham07ropx86}. However, since our RISC-V instructions can
+only have sizes of 16 or 32 bits, the backtracking aspect is much simpler. Our
+implementation is as follows: We scan forward until we find a jump instruction.
+Then we work backwards, two bytes at a time, and try to disassemble instructions
+starting from the new address. Sometimes this can re-misinterpret the initial
+jump instruction that we started from, into a different instruction and the
+sequence becomes unusable. Other times we may encounter bytes that do not encode
+a valid instruction, and this also renders our potential gadget unusable. We
+hypothesize that, due to the sparsity of instruction on RISC-V, this approach
+can only find a limited number of usable instruction, let alone usable ones.
+
+After some initial attempts with this technique, we were able to find a new
+gadget that could increase \verb|t0| based on a register that we control,
+\verb|s7|. Figure~\ref{misinterpreted gadget} shows the gadget that we found,
+and Figure~\ref{actual code sequence} shows what the actual code (which starts
+2 bytes before) is. This gadget ends with \verb|ret|, which is equivalent to
+\verb|jalr ra|. Since we can control \verb|ra| with our initializer gadget, we
+can still make use of it. We recognize that this is not technically a JOP
+gadget, but it is possible that there are other more complicated gadgets that
+accomplish this functionality with the use of \verb|ret|. What we have shown is
+that misinterpreted gadgets can give us functionality that we otherwise did not
+previously have.
+
+\begin{figure}
+    \caption{Misinterpreted gadget}
+    \label{misinterpreted gadget}
+    \begin{lstlisting}
+    add     t0,t0,s7
+    li      a0,2
+    ret
+    \end{lstlisting}
+\end{figure}
+\begin{figure}
+    \caption{Actual code sequence}
+    \label{actual code sequence}
+    \begin{lstlisting}
+    jal     ra,0xb331c
+    li      a0,2
+    ret
+    \end{lstlisting}
+\end{figure}
+
+\subsection{Following Relative Jumps}
+
+Our initial attempt to search for jump gadgets using our modified Galileo
+algorithm presented us with many gadgets that end in relative jumps. At first
+glance, these gadgets are unusable because they redirect control flow to a
+destination that we do not control. However, it is possible that some of these
+gadgets jump to a short instruction sequence which ends with an indirect jump.
+If the indirect jump is determined by a register that we control, then these
+gadgets would possible become of interest to us.
+
+\textit{This space is left for further results regarding this idea.}
+
 % TODO: we don't have any gadgets for storing data.
 % TODO: we don't have any gadgets for storing data.
 
