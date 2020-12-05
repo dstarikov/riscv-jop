@@ -55,6 +55,10 @@
 % for urls
 \usepackage{hyperref}
 
+% for listings
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily}
+
 % to be able to draw some self-contained figs
 \usepackage{tikz}
 \usepackage{amsmath}
@@ -290,19 +294,62 @@ There is a powerful initializer gadget in the \verb|setcontext| function from
 initializer gadget.}
 general purpose registers from memory, based on the address in the \verb|t0|
 register, and then it jumps to the address that it just loaded into \verb|t1|.
-The ability to load so many register from memory and to subsequently jump to an
-address that we can arbitrarily define makes this gadget quite versatile.
-However, before we can utilize it, we must set \verb|t0| to point to our
-dispatch table (which contains all the values that we wish to load) in memory.
+The disassembly of this initializer gadget is shown in Figure~%
+\ref{initializer gadget} The ability to load so many register from memory and
+to subsequently jump to an address that we can arbitrarily define makes this
+gadget quite versatile. However, before we can utilize it, we must set \verb|t0|
+to point to our dispatch table (which contains all the values that we wish to
+load) in memory.
 
 We found dispatcher gadgets that set \verb|t0| from one of the registers that we
 can control with our initializer gadget, and then jump to a different register
-that we control. We use one of these dispatcher gadgets as a prologue to the
+that we control. Figure~\ref{dispatcher gadget} shows an example of these
+dispatcher gadgets. We use one of these dispatcher gadgets as a prologue to the
 initializer gadget, as it allows us to prepare the dispatch table for the
 initializer gadget to load values from. Furthermore, we can endlessly chain
 these gadgets together by setting the source register of the next dispatcher
 gadget using the initializer gadget that precedes it. We (facetiously) refer to
 this combo as our \textit{dispatchilizer} gadget.
+
+\begin{figure}
+    \caption{Initializer gadget}
+    \label{initializer gadget}
+    \begin{lstlisting}
+    ld	t1,176(t0)
+    ld	ra,184(t0)
+    ld	sp,192(t0)
+    ld	s0,240(t0)
+    ld	s1,248(t0)
+    ld	a0,256(t0)
+    ld	a1,264(t0)
+    ld	a2,272(t0)
+    ld	a3,280(t0)
+    ld	a4,288(t0)
+    ld	a5,296(t0)
+    ld	a6,304(t0)
+    ld	a7,312(t0)
+    ld	s2,320(t0)
+    ld	s3,328(t0)
+    ld	s4,336(t0)
+    ld	s5,344(t0)
+    ld	s6,352(t0)
+    ld	s7,360(t0)
+    ld	s8,368(t0)
+    ld	s9,376(t0)
+    ld	s10,384(t0)
+    ld	s11,392(t0)
+    jr	t1
+    \end{lstlisting}
+\end{figure}
+
+\begin{figure}
+    \caption{Dispatcher gadget}
+    \label{dispatcher gadget}
+    \begin{lstlisting}
+    mv  t0,s3
+    jr  a3
+    \end{lstlisting}
+\end{figure}
 
 % TODO: flesh these sections out
 \subsection{Proof of Concept}
