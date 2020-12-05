@@ -227,9 +227,43 @@ based on the reduced instruction set computer (RISC) paradigm. This aims to
 improve a machine's throughput by simplifying instructions and addressing modes,
 thus reducing the cycles needed per instruction and reducing the time per cycle~\cite{patterson98risc}.
 
-% TODO: paragraph about code reuse attacks
+Code injection attacks involve an adversary supplying arbitrary code through an
+innocuous input in a program, and later hijacking control flow to this code.
+While the can be prevented by measures such as W$\oplus$X, code reuse attacks
+such as return-oriented-programming can be just as effective.
 
-% TODO: paragraph about ROP and JOP
+Return-oriented-programming, or ROP, involves the reuse of short instruction
+sequences that end with a return instruction. These short sequences are referred
+to as gadgets. The capability of a gadget can vary, but its functionality by
+itself is usually quite limited. However, when they are chained together, it has
+been shown that an attacker can execute arbitrary operation. The attacker
+supplies addresses to these gadgets, and other values that they may acquire from
+memory. These gadgets are then execute in order as though they are instructions
+for a strange computer built on the misuse of registers and code fragments.
+
+There have been many variations of ROP presented since its initial discovery.
+These include ROP without returns, sigreturn-oriented-programming,
+jump-oriented programming, and string-oriented-programming. These variations
+seek to bypass defenses that focus on certain aspects of one ore more of their
+peers. While ROP was originally proposed for the x86 architecture, it has been
+demonstrated on many other CISC and even RISC architectures. The variations of
+ROP have also been demonstrated on alternate architectures.
+
+While there has been some recent work demonstrating ROP on RISC-V~%
+~\cite{gu20ropriscv,jayolan20ropriscv}, there has not been an explicit
+exploration into jump-oriented programming on these systems. In this work, we
+explore jump-oriented programming on RISC-V and show that it can be used to make
+arbitrary calls to libc. Furthermore, we present a new recipe of gadgets that
+uses a dispatcher gadget followed by a versatile initializer gadget, and
+demonstrate how they can be chained together.
+
+The remainder of this paper is organized as follows: Section 2 walks through our
+approach for re-implementing ROP in RISC-V and implementing a closely related
+variant. Next, Section 3 explains how we implemented jump-oriented programming,
+its limitations, and how we searched for our gadgets. Section 4 discusses our
+results in general, and what we are able to do with them. Section 5 presents
+related work that is tangential to ours. Finally, Section 6 concludes this paper
+and posits ideas for future work.
 
 %-------------------------------------------------------------------------------
 \section{Implementing Variations of ROP}
