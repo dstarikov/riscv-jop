@@ -524,7 +524,7 @@ making our attack much more feasible against ASLR.
 %-------------------------------------------------------------------------------
 \section{Related Work}
 %-------------------------------------------------------------------------------
-There have been multiple papers investigating control-flow integreity (CFI) 
+There have been multiple papers investigating control-flow integrity (CFI) 
 extensions to the RISC-V ISA ~\cite{zipper,fixer}. Zipper \cite{zipper}
 implements a shadow stack to defend against ROP attacks by detecting when return
 addresses are overwritten by a buffer-overflow. This does not protect against
@@ -548,23 +548,41 @@ matrix.
 %-------------------------------------------------------------------------------
 \section{Conclusion and Future Work}
 %-------------------------------------------------------------------------------
+We have shown that on RISC-V it is possible to run a jump-oriented programming
+attack as well as a return-oriented-programming attack without any return
+instructions. These attacks can be mounted in a similar manner as seen in
+research on other architectures such as x86 and ARM on RISC-V. The same vulnerable
+code snippets from those attacks on other ISA's can likewise be exploited on RISC-V
+by following the same attack paradigms as demonstrated on ARM. Exploiting bufffer
+overflows with jump-oriented-programming is a difficult task due to the complexities
+of needing to manage and preserve registers across chains of gadgets with register
+interdependencies. We worked around this by finding and utilizing a very powerful
+initializer gadget, allowing us to easily chain multiple function calls. Unlike ARM,
+RISC-V has support for variable length instructions in the form of the Compressed
+RISC-V extension. We showed how this can be used to find additional useful gadgets
+that are otherwise unavailable, extending the toolset of gadgets available to
+attackers developing ROP or JOP attacks. JOP attacks are resilient to many of
+the defenses against ROP, but can most likely be prevented by code flow integrity
+checks in the processor.
+
+Future work in this space would be to automate the process of finding gadgets and
+crafting attacks through the use of automated SMT solvers. Additionally, more
+research can be done into how Code Flow Integrity can be implemented to defend against
+the misuse of indirect jumps.
+
 
 %-------------------------------------------------------------------------------
-\section*{Acknowledgments}
+% \section*{Acknowledgments}
 %-------------------------------------------------------------------------------
-
-The USENIX latex style is old and very tired, which is why
-there's no \textbackslash{}acks command for you to use when
-acknowledging. Sorry.
 
 %-------------------------------------------------------------------------------
 \section*{Availability}
 %-------------------------------------------------------------------------------
+Our attacks were written for riscv64 Debian GLIBC 2.31-4\\
+The implementations of these attacks can be found in the various branches of our
+repository on Github:\\
+\url{https://github.com/dstarikov/riscv-jop}
 
-USENIX program committees give extra points to submissions that are
-backed by artifacts that are publicly available. If you made your code
-or data available, it's worth mentioning this fact in a dedicated
-section.
 
 %-------------------------------------------------------------------------------
 \bibliographystyle{plain}
