@@ -240,7 +240,7 @@ we manufactured.
 Checkoway et al. described a ``trampoline'' gadget that could be reused to
 achieve this \verb|ret|-like behavior. We were able to successfully implement
 a simplified version of this attack using a real \verb|ret| gadget which incremented
-the stack pointer and performed a ret, allowing us to reuse the ROP gadgets that 
+the stack pointer and performed a ret, allowing us to reuse the JOP versions of ROP gadgets that
 relied on loading from the stack. We modified our gadgets ending with \verb|c.jalr a6|
 to no longer modify the stack pointer. We then rewrote the brainfuck to ROP compiler
 from \cite{gu20ropriscv} to use our updated JOP gadgets and chained them together
@@ -384,6 +384,43 @@ a script that opens a reverse-shell to the attacker over the network.
 %-------------------------------------------------------------------------------
 \section{Discussion}
 %-------------------------------------------------------------------------------
+
+We successully demonstrated the effectiveness of ROP and JOP attacks from
+~\cite{checkoway10ropnoret,bletsch11jopx86,sadeghi15tinyjop} on the RISC-V
+architecture. RISC-V is a RISC-based ISA, like ARM, and the same limitations
+with translating x86 attacks to ARM apply to RISC-V as well. Implementing
+complex chains of JOP gadgets in RISC-V is made difficult for the same reasons
+as described in \cite{bletsch11jopx86}: there is a layer of interdependency
+between JOP gadgets as certain registers need to be maintained to serve as the
+state of the dispatcher between short chains. We work around this limitation
+by using a 'super-loader' gadget which relies on a rarely-used register \verb|t0|
+that always points to our dispatch table to load any values we want into nearly
+any register. This allows us to construct short length JOP chains before
+jumping back to this 'super-loader' in order to setup the next JOP chain.
+This doesn't solve the problem of interdependency however as we now require
+that each short JOP chain moves \verb|t0| forward in the dispatch table before
+jumping back to this 'super-loader' gadget. The benefit of this 'super-loader'
+gadget is that it makes calling arbitrary functions a simple task as it provides
+full control over function-argument registers in addition to the stack-pointer and
+return address. This allows us to implement powerful attacks by simply calling
+multiple functions rather than requiring a set of turing-complete chainable JOP gadgets.
+
+Unlike x86, ARM only supports single-sized instructions which limited the set of
+gadgets available for ROP and JOP attacks in other literature.
+The RV64GC variant of RISC-V introduces a set of compressed instructions that
+allows for variable length instructions - this is less powerful than the
+variable length instructions of x86 but still enabled us to find additional useful
+gadgets which made our attack more powerful. In our initial JOP attack, the pointer
+to the next dispatch buffer needs to be loaded into \verb|t0| before calling the
+'super-loader' gadget. This incurs a limitation of needing to know the exact
+address at which the dispatch-table will be stored in memory when crafting the exploit.
+This is an unrealistic limitation given ASLR. We found very few usuable JOP gadgets in
+\verb|libc| that gave us to control over \verb|t0|. Searching for unintended
+compressed instructions revealed an additional set of short JOP gadgets, including ones
+that modified \verb|t0|. We used one such unintended gadget to increment \verb|t0|
+before jumping to another register. This allowed us to construct a dispatch table that
+did not need to contain pointers to the next dispatch buffer in the dispatch table,
+making our attack much more feasible against ASLR.
 
 %-------------------------------------------------------------------------------
 \section{Related Work}
