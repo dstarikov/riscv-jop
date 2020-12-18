@@ -214,8 +214,46 @@
   month =        feb,
   organization = {Internet Society}
 }
-
-
+@misc{brainfuck,
+    author = {Urban Müller},
+    title = {brainfuck, An Eight-Instruction Turing-Complete Programming Language},
+    year = 1993,
+    note = {\url{https://www.muppetlabs.com/~breadbox/bf/}}
+}
+@misc{w^x,
+    author = {Theo de Raadt},
+    title = {OpenBSD 3.3 announcement (public release of W$\oplus$X)},
+    year = 2003,
+    note = {\url{https://www.openbsd.org/33.html}}
+}
+@inproceedings{buchanan08roprisc,
+    author = {Buchanan, Erik and Roemer, Ryan and Shacham, Hovav and Savage, Stefan},
+    title = {When Good Instructions Go Bad: Generalizing Return-Oriented Programming to RISC},
+    year = {2008},
+    isbn = {9781595938107},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    note = {\url{https://doi.org/10.1145/1455770.1455776}},
+    doi = {10.1145/1455770.1455776},
+    pages = {27–38},
+    numpages = {12},
+    keywords = {SPARC, return-oriented programming, RISC, return-into-libc},
+    location = {Alexandria, Virginia, USA},
+    series = {CCS '08}
+}
+@phdthesis{kornau10roparm,
+    title={Return oriented programming for the ARM architecture},
+    author={Kornau, Tim and others},
+    year={2010},
+    school={Master’s thesis, Ruhr-Universit{\"a}t Bochum},
+    note={\url{http://www.handgrep.se/repository/ebooks/Security/Reversing/kornau-tim--diplomarbeit--rop.pdf}}
+}
+@article{pax03aslr,
+    title={Address space layout randomization (ASLR), 2003},
+    author={Team, PaX},
+    note={\url{https://pax. grsecurity.net/docs/aslr.txt}},
+    year={2003}
+}
 \end{filecontents}
 
 %-------------------------------------------------------------------------------
@@ -261,7 +299,7 @@ printing strings using \verb|putchar| or launching a shell using \verb|execve|.
 %-------------------------------------------------------------------------------
 
 RISC-V is a free and open instruction set architecture (ISA) introduced by UC
-Berkeley in 2010. Although it was initially designed for research and education
+Berkeley in 2010~\cite{riscvmanual}. Although it was initially designed for research and education
 purposes, it is being increasingly used in commercial settings. RISC-V is a
 based on the reduced instruction set computer (RISC) paradigm. This aims to
 improve a machine's throughput by simplifying instructions and addressing modes,
@@ -269,7 +307,7 @@ thus reducing the cycles needed per instruction and reducing the time per cycle~
 
 Code injection attacks involve an adversary supplying arbitrary code through an
 innocuous input in a program, and later hijacking control flow to this code.
-While the can be prevented by measures such as W$\oplus$X, code reuse attacks
+While the can be prevented by measures such as ASLR~\cite{pax03aslr} and W$\oplus$X~\cite{w^x}, code reuse attacks
 such as return-oriented-programming can be just as effective.
 
 Return-oriented-programming, or ROP, involves the reuse of short instruction
@@ -287,7 +325,7 @@ sigreturn-oriented-programming~\cite{bosman14sigrop},
 jump-oriented programming~\cite{bletsch11jopx86}, and string-oriented-programming~\cite{payer13sop}. These variations
 seek to bypass defenses that focus on certain aspects of one ore more of their
 peers. While ROP was originally proposed for the x86 architecture, it has been
-demonstrated on many other CISC and even RISC architectures. The variations of
+demonstrated on many other CISC and even RISC architectures~\cite{buchanan08roprisc,kornau10roparm}. The variations of
 ROP have also been demonstrated on alternate architectures.
 
 While there has been some recent work demonstrating ROP on RISC-V~%
@@ -319,7 +357,7 @@ found the exact version of \verb|libc.so| that the authors used and cross-refere
 it with the addresses from their compiler to find their exact gadgets. We then
 implemented these gadgets in an assembly file and modified their compiler to use
 the addresses of our gadgets. With this in place we were able to successfully execute
-brainfuck~\cite{gu20ropriscv} programs through ROP on our VM's. Next we sought to port a variant of
+brainfuck~\cite{gu20ropriscv,brainfuck} programs through ROP on our VM's. Next we sought to port a variant of
 ROP, which does not use returns~\cite{checkoway10ropnoret}, from x86 to RISC-V.
 
 At first, we reused the gadgets that we implemented in the aforementioned plain ROP
