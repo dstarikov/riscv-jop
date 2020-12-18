@@ -261,6 +261,22 @@
     note={\url{https://pax. grsecurity.net/docs/aslr.txt}},
     year={2003}
 }
+@misc{ropper,
+  author = {Sascha Schirra},
+  title = {Ropper},
+  year = {2014},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/sashs/Ropper}},
+}
+@misc{capstone,
+  author = {Nguyen Anh Quynh},
+  title = {Capstone},
+  year = {2013},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/aquynh/capstone}},
+}
 \end{filecontents}
 
 %-------------------------------------------------------------------------------
@@ -472,6 +488,19 @@ this combo as our \textit{dispatchilizer} gadget.
 \end{figure}
 
 % TODO: flesh these sections out
+\subsection{Finding Useful Gadgets}
+Our attack requires finding and using gadgets from an object file. There are
+various open source toolsets for this task, but none with support for RISC-V.
+Initially, we manually searched for gadgets using regular expressions on the disassembled
+object files. This was both a cumbersome and time consuming task. We found Ropper~\cite{ropper}
+which is an open source project implementing a gadget scanner built on top of a
+multi-architecture disassembly framework, capstone~\cite{capstone}. Ropper scans an
+object file for potential gadgets by looking for gadget epilogues such as returns or jumps.
+The latest versions of capstone support RISC-V and allowed us to to extend Ropper to RISC-V by implementing a
+scanner for RISC-V jump instructions and adding bindings to the RISC-V capstone library.
+We used our additions to Ropper to assist in finding useful JOP gadgets that have minimal
+side effects. Using this tool proved to be much more effective than manually searching.
+
 \subsection{Proof of Concept}
 %-------------------------------------------------------------------------------
 
@@ -514,9 +543,10 @@ that will be restored to registers when printf returns. These registers
 are set in the printf\_stack buffer and continue the JOP chain to the next
 initializer gadget. This gadget sets up the argument registers as pointers
 to an array of strings containing an executable and arguments to pass to
-execve. We demonstrate how this can be used to execute arbitrary executables
-or even shell scripts.We show how this can be used to pass in a script that
-opens a reverse-shell to the attacker over the network.
+execve. We show how this can be used to execute arbitrary executables
+or even shell scripts. We demonstrate this capability with an example attack
+that injects a JOP attack to run a script that opens a reverse-shell to the
+attacker over the network.
 
 \begin{figure}
     \caption{Dispatch table chaining function calls}
