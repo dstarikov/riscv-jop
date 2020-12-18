@@ -677,17 +677,58 @@ previously have.
 \subsection{Following Relative Jumps}
 
 Our initial attempt to search for jump gadgets using our modified Galileo
-algorithm presented us with many gadgets that end in relative jumps. At first
+algorithm presented us with many gadgets that ended with relative jumps. At first
 glance, these gadgets are unusable because they redirect control flow to a
 destination that we do not control. However, it is possible that some of these
 gadgets jump to a short instruction sequence which ends with an indirect jump.
 If the indirect jump is determined by a register that we control, then these
-gadgets would possible become of interest to us.
+gadgets would possibly become of interest to us.
 
-\textit{This space is left for further results regarding this idea.}
+We developed a simple program to scan through the executable sections of a given
+object file. Upon reaching a relative jump instruction, we attempted to
+disassemble the next five instructions that would follow. In other words, we
+would seek to the address implied by the relative jump. If an invalid 
+instruction is found after the relative jump, then that renders the entire 
+gadget unusable so we skip it. We chose a limit of four instructions because 
+large gadgets are likely to have undesirable register clobbering.
 
-% TODO: we don't have any gadgets for storing data.
-% TODO: we don't have any gadgets for storing data.
+This program analyzed the same \verb|libc| file that we used in our earlier
+gadget searching. We measured how many total relative jumps led to an indirect
+jump, within $x$ instructions where $x\in[0,4]$. For completeness, we repeated 
+the analysis twice: including and excluding \verb|ret|. Our search results are 
+presented in Table \ref{table:indjmp}.
+
+\begin{table}
+    \caption{Number of indirect jumps within $x$ instructions of a relative jump}
+    \label{table:indjmp}
+    \begin{center}
+        \begin{tabular}{|r|r|r|}
+            \hline
+            $x$ & With \verb|ret| & Without \verb|ret|\\
+            \hline
+            0 & 38 & 16 \\
+            \hline
+            1 & 81 & 23 \\
+            \hline
+            2 & 334 & 276 \\
+            \hline
+            3 & 334 & 276 \\
+            \hline
+            4 & 334 & 276 \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+There were a total of 24,000 relative jumps in the text section of the
+\verb|libc| file. This means that only approximately 1\% of relative jumps
+lead to concise, desirable epilogues. Among the potential gadgets, the majority
+of indirect jumps relied on either the \verb|t5| or the \verb|t6| register. This
+posed an additional limitation because our dispatchilizer is not able to
+manipulate those registers by itself. As a result, we decided to forgo further
+investigation into following relative jumps during our gadget scanning. We do
+not rule out their potential utility entirely. However, we suspect that their
+scarcity and size would make them only usable in certain scenarios.
 
 %-------------------------------------------------------------------------------
 \section{Discussion}
