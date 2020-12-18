@@ -315,7 +315,7 @@ University of Washington
 \begin{abstract}
 %-------------------------------------------------------------------------------
 This paper explores the viability of jump-oriented-programming (JOP) on RISC-V,
-a new open-source ISA that is gaining popularity in embedded systems. We add to
+a new open-source ISA that is gaining popularity in many different settings. We add to
 the code reuse attack repertoire by extending variations of return-oriented-%
 programming from their initial architectures to RISC-V. We analyze \verb|libc|
 for real JOP gadgets that can be used for these attacks, and find versatile
@@ -336,33 +336,33 @@ improve a machine's throughput by simplifying instructions and addressing modes,
 thus reducing the cycles needed per instruction and reducing the time per cycle~\cite{patterson98risc}.
 
 Code injection attacks involve an adversary supplying arbitrary code through an
-innocuous input in a program, and later hijacking control flow to this code.
-While the can be prevented by measures such as ASLR~\cite{pax03aslr} and W$\oplus$X~\cite{w^x}, code reuse attacks
-such as return-oriented-programming can be just as effective.
+innocuous input in a program, and later hijacking control flow to execute this code.
+While code injection attacks can be prevented by measures such as ASLR~\cite{pax03aslr} and W$\oplus$X~\cite{w^x}, code \textit{reuse} attacks can bypass these defenses and be just as effective.
+Return-oriented-programming is an example of a code reuse attack.
 
 Return-oriented-programming, or ROP, involves the reuse of short instruction
 sequences that end with a return instruction~\cite{shacham07ropx86}. These short sequences are referred
 to as gadgets. The capability of a gadget can vary, but its functionality by
-itself is usually quite limited. However, when they are chained together, it has
-been shown that an attacker can execute arbitrary operation. The attacker
+itself is usually quite limited. However, when they used together in a sequence, it has
+been shown that an attacker can execute arbitrary operations. The attacker
 supplies addresses to these gadgets, and other values that they may acquire from
-memory. These gadgets are then execute in order as though they are instructions
+memory. These gadgets are then executed in order as though they are instructions
 for a strange computer built on the misuse of registers and code fragments.
 
 There have been many variations of ROP presented since its initial discovery.
 These include ROP without returns~\cite{checkoway10ropnoret},
 sigreturn-oriented-programming~\cite{bosman14sigrop},
 jump-oriented programming~\cite{bletsch11jopx86}, and string-oriented-programming~\cite{payer13sop}. These variations
-seek to bypass defenses that focus on certain aspects of one ore more of their
+seek to bypass defenses that focus on certain aspects of one or more of their
 peers. While ROP was originally proposed for the x86 architecture, it has been
 demonstrated on many other CISC and even RISC architectures~\cite{buchanan08roprisc,kornau10roparm}. The variations of
 ROP have also been demonstrated on alternate architectures.
 
 While there has been some recent work demonstrating ROP on RISC-V~%
 ~\cite{gu20ropriscv,jaloyan20ropriscv}, there has not been an explicit
-exploration into jump-oriented programming on these systems. In this work, we
-explore jump-oriented programming on RISC-V and show that it can be used to make
-arbitrary calls to libc. Furthermore, we present a new recipe of gadgets that
+exploration into jump-oriented-programming on these systems. In this work, we
+explore jump-oriented-programming on RISC-V and show that it can be used to make
+arbitrary calls to \verb|libc|. Furthermore, we present a new recipe of gadgets that
 uses a dispatcher gadget followed by a versatile initializer gadget, and
 demonstrate how they can be chained together.
 
@@ -387,7 +387,7 @@ found the exact version of \verb|libc.so| that the authors used and cross-refere
 it with the addresses from their compiler to find their exact gadgets. We then
 implemented these gadgets in an assembly file and modified their compiler to use
 the addresses of our gadgets. With this in place we were able to successfully execute
-brainfuck~\cite{gu20ropriscv,brainfuck} programs through ROP on our VM's. Next we sought to port a variant of
+brainfuck~\cite{gu20ropriscv,brainfuck} programs through ROP on our VMs. Next we sought to port a variant of
 ROP, which does not use returns~\cite{checkoway10ropnoret}, from x86 to RISC-V.
 
 At first, we reused the gadgets that we implemented in the aforementioned plain ROP
@@ -401,9 +401,9 @@ concept, but it was not realistic because it relied on gadget modification that
 we manufactured.
 
 Checkoway et al. described a ``trampoline'' gadget that could be reused to
-achieve this \verb|ret|-like behavior. We were able to successfully implement
+achieve this \verb|ret|-like behavior~\cite{checkoway10ropnoret}. We were able to successfully implement
 a simplified version of this attack using a real \verb|ret| gadget which incremented
-the stack pointer and performed a ret, allowing us to reuse the JOP versions of ROP gadgets that
+the stack pointer and performed a \verb|ret|, allowing us to reuse the JOP versions of ROP gadgets that
 relied on loading from the stack. We modified our gadgets ending with \verb|c.jalr a6|
 to no longer modify the stack pointer. We then rewrote the brainfuck to ROP compiler
 from \cite{gu20ropriscv} to use our updated JOP gadgets and chained them together
@@ -417,7 +417,7 @@ and requires an unrealistic gadget that increments the stack before performing a
 \section{Implementing JOP}
 %-------------------------------------------------------------------------------
 
-In this section we describe our methodology for crafting a jump-oriented
+In this section we describe our methodology for crafting a jump-oriented-%
 programming attack. In addition, we discuss its capabilities, limitations, and
 possible real-world applications. Our approach is inspired by the previous work
 on this topic by Bletsch et al.~\cite{bletsch11jopx86}. Their research was done
@@ -433,7 +433,7 @@ we found a gadget that achieves a similar effect.
 There is a powerful initializer gadget in the \verb|setcontext| function from
 \verb|libc|. It loads almost all%
 % TODO: \verb| | the registers in this foonote, somehow
-\footnote{gp, tp, t0, t2, t3, t4, t5, and t6 are the only registers that are not set by this
+\footnote{\texttt{gp}, \texttt{tp}, \texttt{t0}, \texttt{t2}, \texttt{t3}, \texttt{t4}, \texttt{t5}, and \texttt{t6} are the only registers that are not set by this
 initializer gadget.}
 general purpose registers from memory, based on the address in the \verb|t0|
 register, and then it jumps to the address that it just loaded into \verb|t1|.
@@ -497,14 +497,15 @@ this combo as our \textit{dispatchilizer} gadget.
 % TODO: flesh these sections out
 \subsection{Finding Useful Gadgets}
 Our attack requires finding and using gadgets from an object file. There are
-various open source toolsets for this task, but none with support for RISC-V.
+various open source toolsets for this task, but none with current support for RISC-V.
 Initially, we manually searched for gadgets using regular expressions on the disassembled
-object files. This was both a cumbersome and time consuming task. We found Ropper~\cite{ropper}
-which is an open source project implementing a gadget scanner built on top of a
-multi-architecture disassembly framework, capstone~\cite{capstone}. Ropper scans an
+object files. This was both a cumbersome and time consuming task. We also reimplemented the
+Galileo search algorithm from~\cite{shacham07ropx86}, but later found an existing tool
+that we could contribute to. Ropper~\cite{ropper} is an open source project implementing a gadget scanner built on top of a
+multi-architecture disassembly framework, Capstone~\cite{capstone}. Ropper scans an
 object file for potential gadgets by looking for gadget epilogues such as returns or jumps.
-The latest versions of capstone support RISC-V and allowed us to to extend Ropper to RISC-V by implementing a
-scanner for RISC-V jump instructions and adding bindings to the RISC-V capstone library.
+The latest versions of Capstone support RISC-V and allowed us to to extend Ropper to RISC-V by implementing a
+scanner for RISC-V jump instructions and adding bindings to the RISC-V Capstone library.
 We used our additions to Ropper to assist in finding useful JOP gadgets that have minimal
 side effects. Using this tool proved to be much more effective than manually searching.
 
@@ -699,7 +700,7 @@ instruction is found after the relative jump, then that renders the entire
 gadget unusable so we skip it. We chose a limit of four instructions because 
 large gadgets are likely to have undesirable register clobbering.
 
-This program analyzed the same \verb|libc| file that we used in our earlier
+This program analyzed the same \verb|libc.so.6| file that we used in our earlier
 gadget searching. We measured how many total relative jumps led to an indirect
 jump, within $x$ instructions where $x\in[0,4]$. For completeness, we repeated 
 the analysis twice: including and excluding \verb|ret|. Our search results are 
