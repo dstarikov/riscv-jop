@@ -171,12 +171,48 @@
     doi={10.23919/DATE.2019.8714980}
 }
 @misc{zipper,
-      title={Zipper Stack: Shadow Stacks Without Shadow}, 
-      author={Jinfeng Li and Liwei Chen and Qizhen Xu and Linan Tian and Gang Shi and Kai Chen and Dan Meng},
-      year={2020},
-      eprint={1902.00888},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR}
+    title={Zipper Stack: Shadow Stacks Without Shadow}, 
+    author={Jinfeng Li and Liwei Chen and Qizhen Xu and Linan Tian and Gang Shi and Kai Chen and Dan Meng},
+    year={2020},
+    eprint={1902.00888},
+    archivePrefix={arXiv},
+    primaryClass={cs.CR}
+}
+@inproceedings{bosman14sigrop,
+    author={E. {Bosman} and H. {Bos}},
+    booktitle={2014 IEEE Symposium on Security and Privacy}, 
+    title={Framing Signals - A Return to Portable Shellcode}, 
+    year={2014},
+    volume={},
+    number={},
+    pages={243-258},
+    doi={10.1109/SP.2014.23}
+}
+@inproceedings{payer13sop,
+    author = {Payer, Mathias and Gross, Thomas R.},
+    title = {String Oriented Programming: When ASLR is Not Enough},
+    year = {2013},
+    isbn = {9781450318570},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/2430553.2430555},
+    doi = {10.1145/2430553.2430555},
+    abstract = {Control-data attacks are a well known attack vector; these attacks either inject new code into running applications or reuse existing code in an unintended way to execute their malicious payload.Current software systems are protected against control-data attacks using numerous mechanisms like Data Execution Prevention (DEP), stack canaries, and Address Space Layout Randomization (ASLR). ASLR turns deterministic attacks into probabilistic attacks and reduces the probability of a successful attack. Unfortunately, the current ASLR implementation for Linux leaves some memory regions non-randomized. These static memory regions can be used to exploit applications that have ASLR, DEP, and stack canaries enabled.Format string exploits are an often overlooked attack vector that enables attacker-controlled memory writes in an application. A format string bug exists if a user-supplied string is passed as a first argument to any printf function. The only prerequisite for a successful format string exploit is that the attacker must be able to control that format string.This paper presents String Oriented Programming (SOP), an approach that exploits static memory regions in ASLR enabled applications. SOP uses a format string bug to exploit applications that are protected by a combination of weak ASLR, DEP, and stack canaries. Similar to return oriented programming or jump oriented programming, SOP does not rely on existing code but concatenates gadgets in the application using static program analysis.},
+    booktitle = {Proceedings of the 2nd ACM SIGPLAN Program Protection and Reverse Engineering Workshop},
+    articleno = {2},
+    numpages = {9},
+    location = {Rome, Italy},
+    series = {PPREW '13}
+}
+@InProceedings{shacham15lejit,
+  author =       {Wilson Lian and Hovav Shacham and Stefan Savage},
+  title =        {Too {LeJIT} to Quit: Extending {JIT} Spraying to
+                  {ARM}},
+  booktitle =    {Proceedings of NDSS 2015},
+  year =         2015,
+  editor =       {Engin Kirda},
+  month =        feb,
+  organization = {Internet Society}
 }
 
 
@@ -237,7 +273,7 @@ While the can be prevented by measures such as W$\oplus$X, code reuse attacks
 such as return-oriented-programming can be just as effective.
 
 Return-oriented-programming, or ROP, involves the reuse of short instruction
-sequences that end with a return instruction. These short sequences are referred
+sequences that end with a return instruction~\cite{shacham07ropx86}. These short sequences are referred
 to as gadgets. The capability of a gadget can vary, but its functionality by
 itself is usually quite limited. However, when they are chained together, it has
 been shown that an attacker can execute arbitrary operation. The attacker
@@ -246,15 +282,16 @@ memory. These gadgets are then execute in order as though they are instructions
 for a strange computer built on the misuse of registers and code fragments.
 
 There have been many variations of ROP presented since its initial discovery.
-These include ROP without returns, sigreturn-oriented-programming,
-jump-oriented programming, and string-oriented-programming. These variations
+These include ROP without returns~\cite{checkoway10ropnoret},
+sigreturn-oriented-programming~\cite{bosman14sigrop},
+jump-oriented programming~\cite{bletsch11jopx86}, and string-oriented-programming~\cite{payer13sop}. These variations
 seek to bypass defenses that focus on certain aspects of one ore more of their
 peers. While ROP was originally proposed for the x86 architecture, it has been
 demonstrated on many other CISC and even RISC architectures. The variations of
 ROP have also been demonstrated on alternate architectures.
 
 While there has been some recent work demonstrating ROP on RISC-V~%
-~\cite{gu20ropriscv,jayolan20ropriscv}, there has not been an explicit
+~\cite{gu20ropriscv,jaloyan20ropriscv}, there has not been an explicit
 exploration into jump-oriented programming on these systems. In this work, we
 explore jump-oriented programming on RISC-V and show that it can be used to make
 arbitrary calls to libc. Furthermore, we present a new recipe of gadgets that
@@ -282,7 +319,7 @@ found the exact version of \verb|libc.so| that the authors used and cross-refere
 it with the addresses from their compiler to find their exact gadgets. We then
 implemented these gadgets in an assembly file and modified their compiler to use
 the addresses of our gadgets. With this in place we were able to successfully execute
-brainfuck programs through ROP on our VM's. Next we sought to port a variant of
+brainfuck~\cite{gu20ropriscv} programs through ROP on our VM's. Next we sought to port a variant of
 ROP, which does not use returns~\cite{checkoway10ropnoret}, from x86 to RISC-V.
 
 At first, we reused the gadgets that we implemented in the aforementioned plain ROP
@@ -409,12 +446,72 @@ the initializer portion, preparing the next jump to the dispatchilizer, and
 jumping to the function which then returns to dispatchilizer. 
 
 We demonstrated this capability by implementing a dispatch table compiler in
-Python which prints arbitrary strings using multiple calls to \verb|putchar|
-before calling \verb|execve| using an array of strings stored in the dispatch
-table. Furthermore, we utilize this array of strings to execute arbitrary
-executables on the host machine as well as shell-scripts. We show how this can
-be used to run a script that opens a reverse-shell to the attacker over the
-network.
+Python which is able to chain calls to arbitrary functions and other gadgets.
+Figure~\ref{dispatch table} shows an example dispatch table that calls multiple
+short JOP chains and various \verb|libc| functions. Each buffer contains the
+registers for the initializer gadget to load. The first buffer will load
+the dispatcher gadgets address into \verb|t1|, causing execution to jump to
+the dispatcher. The dispatcher then moves \verb|s3|, which contains the address
+of the next buf, into \verb|t1| before jumping to \verb|a3| which contains
+the address of \verb|putchar|. Finally \verb|putchar| will print the character
+in \verb|a0| before returning to the address in \verb|ra|, which contains the
+initializer gadgets address. The initializer will then load the register values
+to execute \verb|printf| in the same manner. buf3 executes scanf and clobbers
+\verb|t0| and \verb|a3|. Thus a short JOP chain after the function call is
+required: first going to a gadget to setup the dispatcher jump address,
+then the dispatcher to setup the next dispatch table buffer, and finally the
+initializer gadget. buf4 demonstrates a function call using a dereferenced
+pointer as an argument. There is a short JOP chain prior to calling
+printf which loads memory from an address in register \verb|s0| into \verb|a1|,
+sets the argument in \verb|a0| clobbered by the previous gadget, and finally
+calls printf with the stack pointer pointing to attacker controlled memory
+that will be restored to registers when printf returns. These registers
+are set in the printf\_stack buffer and continue the JOP chain to the next
+initializer gadget. This gadget sets up the argument registers as pointers
+to an array of strings containing an executable and arguments to pass to
+execve. We demonstrate how this can be used to execute arbitrary executables
+or even shell scripts.We show how this can be used to pass in a script that
+opens a reverse-shell to the attacker over the network.
+
+\begin{figure}
+    \caption{Dispatch table chaining function calls}
+    \label{dispatch table}
+    \begin{center}
+    \scriptsize
+    \begin{tabular}{|c|l|l|}
+    \hline
+    buf1        &\verb|t1| = \&dispatcher              &\verb|s3| = \&buf2\\
+    (putchar)   &\verb|a3| = \&\verb|putchar|          &\verb|a0| = ‘z’\\
+                &\verb|ra| = \&initializer             &\\
+    \hline
+    buf2        &\verb|t1| = \&dispatcher              &\verb|s3| = \&buf3\\
+    (printf)    &\verb|a3| = \&\verb|printf|           &\verb|a0| = \&"Enter a number: "\\
+                &\verb|ra| = \&initializer             &\\
+    \hline
+                &\verb|t1| = \&\verb|scanf|            &\verb|s3| = \&buf4 \\
+    buf3        &\verb|ra| = \&mv\_s2\_to\_a3\_j\_s1   &\verb|a0| = \&"\%d"\\
+    (scanf)     &\verb|s1| = \&dispatcher              &\verb|a1| = \&integer\_ptr\\
+                &\verb|s2| = \&initializer             &\\
+    \hline
+    buf4        &\verb|t1| = \&ld\_a1\_from\_s0\_j\_a5 &\verb|s0| = \&integer\_ptr\\
+    (printf)    &\verb|a5| = \&mv\_s6\_to\_a0\_j\_s5   &\verb|s6| = \&"you entered: \%d$\backslash$n"\\
+                &\verb|s5| = \&\verb|printf|           &\verb|sp| = \&printf\_stack\_buf\\
+    \hline
+                &\verb|ra| = \&mv\_s2\_to\_a3\_j\_s1   &\\
+    printf stack&\verb|s1| = \&dispatcher              &s3 = \&buf5\\
+                &\verb|s2| = \&initializer             &\\
+    \hline
+                &char* strings[] =                     &str1 = "/bin/bash"\\
+    strings buf &\{\&str1, \&str2, \&str3, 0\}         &str2 = "-c"\\
+                &                                      &str3 = "<bash script>"\\
+    \hline
+    buf5        &\verb|t1| = \&dispatcher              &\verb|s3| = \&buf6\\
+    (execve)    &\verb|a3| = \&\verb|execve|           &\verb|a0| = \&str1\\
+                &\verb|ra| = \&initializer             &\verb|a1| = \&s\\
+    \hline
+    \end{tabular}
+    \end{center}
+\end{figure}
 
 % TODO: real-world vulnerable program (setjmp)
 
@@ -431,7 +528,6 @@ In the current state of our attack, we need the virtual addresses of the
 gadgets we use ahead of time. While this means our attack could be thwarted by
 ASLR, there are a number of ways to get around this that we consider out of
 scope for our research.
-
 
 \subsection{C Extension and Misinterpretation}
 %-------------------------------------------------------------------------------
@@ -542,8 +638,12 @@ full control over function-argument registers in addition to the stack-pointer a
 return address. This allows us to implement powerful attacks by simply calling
 multiple functions rather than requiring a set of turing-complete chainable JOP gadgets.
 
-Unlike x86, ARM only supports single-sized instructions which limited the set of
-gadgets available for ROP and JOP attacks in other literature.
+AArch32, 32-bit ARM, supports variable length instructions: execution mode can be changed
+to either 32-bit ARM mode or 16-bit Thumb mode, and Thumb2 mode allows for executing
+both on a 16-bit alignment. This enables the processor to execute misaligned
+instructions and has been used in other code-reuse attacks such as JIT spraying~\cite{shacham15lejit}.
+AArch64, 64-bit ARM, on the other hand only supports single-sized instructions,
+limiting the set of gadgets available for ROP and JOP attacks in other literature. 
 The RV64GC variant of RISC-V introduces a set of compressed instructions that
 allows for variable length instructions - this is less powerful than the
 variable length instructions of x86 but still enabled us to find additional useful
